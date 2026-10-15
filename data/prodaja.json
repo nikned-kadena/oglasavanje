@@ -1,0 +1,554 @@
+[
+  {
+    "nekretnina": "West 65_40.01",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "kir",
+    "id": "prod001"
+  },
+  {
+    "nekretnina": "ZONED",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "never_remove",
+    "id": "prod002"
+  },
+  {
+    "nekretnina": "Čelopečka 4, Zvezdara, Zahumska",
+    "agent": "Jovana Angelovski",
+    "vlasnik": "",
+    "datum": "21.07.2026",
+    "haloStatus": "active",
+    "id": "prod003"
+  },
+  {
+    "nekretnina": "Knez Mihailova 18/A",
+    "agent": "Tijana Janković",
+    "vlasnik": "",
+    "datum": "24.08.2026",
+    "haloStatus": "active",
+    "id": "prod004"
+  },
+  {
+    "nekretnina": "BW-QU1-A010",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "hidden",
+    "id": "prod005"
+  },
+  {
+    "nekretnina": "Vojvode Stepe 081_stan 26",
+    "agent": "Milica Škorić",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod006"
+  },
+  {
+    "nekretnina": "BW-PER-906",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod007"
+  },
+  {
+    "nekretnina": "BW-TER-903",
+    "agent": "Tijana Janković",
+    "vlasnik": "",
+    "datum": "24.08.2026",
+    "haloStatus": "active",
+    "id": "prod008"
+  },
+  {
+    "nekretnina": "BW-REG-3102",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod009"
+  },
+  {
+    "nekretnina": "BW-QU3 A801",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "hidden",
+    "id": "prod010"
+  },
+  {
+    "nekretnina": "BW-ETE-B802",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "hidden",
+    "id": "prod011"
+  },
+  {
+    "nekretnina": "BW-MET-A209",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "08.07.2026",
+    "haloStatus": "active",
+    "id": "prod012"
+  },
+  {
+    "nekretnina": "Generala Nikodija Stefanovića 3",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "kir",
+    "id": "prod013"
+  },
+  {
+    "nekretnina": "Senjačka 048",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "kir",
+    "id": "prod014"
+  },
+  {
+    "nekretnina": "Bokeljska 7_stan 27",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "active",
+    "id": "prod015"
+  },
+  {
+    "nekretnina": "Bokeljska 7_stan 2",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "active",
+    "id": "prod016"
+  },
+  {
+    "nekretnina": "Nikole Pašića 193, Mladenovac, vila Vista",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "21.07.2026",
+    "haloStatus": "active",
+    "id": "prod017"
+  },
+  {
+    "nekretnina": "Tadije Sondermajera 1, stan 40, wellport",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod018"
+  },
+  {
+    "nekretnina": "K-District_stan 1.9.2",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod019"
+  },
+  {
+    "nekretnina": "Braničevska 1_stan  4",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "hidden",
+    "id": "prod020"
+  },
+  {
+    "nekretnina": "Bulevar  Mihajla Pupina, stan 6",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "hidden",
+    "id": "prod021"
+  },
+  {
+    "nekretnina": "BW-VIS-2104",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod022"
+  },
+  {
+    "nekretnina": "BW-REG-3704",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod023"
+  },
+  {
+    "nekretnina": "Venizelosova 29 B, Novi Dorćol, stan 36",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod024"
+  },
+  {
+    "nekretnina": "Knez Miletina 25_stan 9",
+    "agent": "Ana Ralevski",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod025"
+  },
+  {
+    "nekretnina": "Vojislava Stojanovića br.20_ Green hill_stan E5-E41 br. 20",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod026"
+  },
+  {
+    "nekretnina": "BW-REG-3010",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod027"
+  },
+  {
+    "nekretnina": "BW-SI2-1204",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod028"
+  },
+  {
+    "nekretnina": "Cara Dušana_C.21.PS_Skenderbegova",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod029"
+  },
+  {
+    "nekretnina": "kuća Bela Crkva",
+    "agent": "Slađana Vukmirović",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "kir",
+    "id": "prod030"
+  },
+  {
+    "nekretnina": "HADŽI PRODANOVA, STAN 7",
+    "agent": "Tijana Janković",
+    "vlasnik": "",
+    "datum": "24.07.2026",
+    "haloStatus": "active",
+    "id": "prod031"
+  },
+  {
+    "nekretnina": "HADŽI PRODANOVA, STAN 5",
+    "agent": "Tijana Janković",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod032"
+  },
+  {
+    "nekretnina": "BW-PER-1408",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "27.07.2026",
+    "haloStatus": "active",
+    "id": "prod033"
+  },
+  {
+    "nekretnina": "Airport Garden_Đorđa Stanojevića 37_stan C2 06",
+    "agent": "Sanja Stanojević",
+    "vlasnik": "",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "prod034"
+  },
+  {
+    "nekretnina": "BW-RIV-507",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "20.07.2026",
+    "haloStatus": "active",
+    "id": "prod035"
+  },
+  {
+    "nekretnina": "BW-RIV-607",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "20.07.2026",
+    "haloStatus": "active",
+    "id": "prod036"
+  },
+  {
+    "nekretnina": "Sokolska 4, stan 13",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "kir",
+    "id": "prod037"
+  },
+  {
+    "nekretnina": "ZepTerra 3.28",
+    "agent": "Ana Ralevski",
+    "vlasnik": "",
+    "datum": "21.07.2026",
+    "haloStatus": "active",
+    "id": "prod038"
+  },
+  {
+    "nekretnina": "Viktora Starčića 5, Radiofarm, Surčin",
+    "agent": "Ana Ralevski",
+    "vlasnik": "",
+    "datum": "21.07.2026",
+    "haloStatus": "active",
+    "id": "prod039"
+  },
+  {
+    "nekretnina": "Kralja Milana 21_stan 8",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "22.07.2026",
+    "haloStatus": "active",
+    "id": "prod040"
+  },
+  {
+    "nekretnina": "BW-RIM-2102",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "22.07.2026",
+    "haloStatus": "active",
+    "id": "prod041"
+  },
+  {
+    "nekretnina": "Airport Garden_Đorđa Stanojevića 37_stan 65",
+    "agent": "Slađana Vukmirović",
+    "vlasnik": "",
+    "datum": "23.07.2026",
+    "haloStatus": "active",
+    "id": "prod042"
+  },
+  {
+    "nekretnina": "Airport Garden_Đorđa Stanojevića 37_stan 88",
+    "agent": "Slađana Vukmirović",
+    "vlasnik": "",
+    "datum": "24.07.2026",
+    "haloStatus": "active",
+    "id": "prod043"
+  },
+  {
+    "nekretnina": "Kuća Kovilj, Jovice Pavlice 3",
+    "agent": "Ana Ralevski",
+    "vlasnik": "",
+    "datum": "11.08.2026",
+    "haloStatus": "active",
+    "id": "prod044"
+  },
+  {
+    "nekretnina": "Andre Nikolića 12B_stan 3",
+    "agent": "Ana Ralevski",
+    "vlasnik": "",
+    "datum": "11.08.2026",
+    "haloStatus": "active",
+    "id": "prod045"
+  },
+  {
+    "nekretnina": "West 65_stan 4.5",
+    "agent": "Jovana Angelovski",
+    "vlasnik": "",
+    "datum": "18.08.2026",
+    "haloStatus": "active",
+    "id": "prod046"
+  },
+  {
+    "nekretnina": "Bulevar Maršala Tolbuhina 11_stan 37",
+    "agent": "Tijana Janković",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "active",
+    "id": "prod047"
+  },
+  {
+    "nekretnina": "Slobodana Jovanovića 19_stan 1",
+    "agent": "Tijana Janković",
+    "vlasnik": "",
+    "datum": "",
+    "haloStatus": "active",
+    "id": "prod048"
+  },
+  {
+    "nekretnina": "BW-SEN-B606",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "16.09.2026",
+    "haloStatus": "active",
+    "id": "prod049"
+  },
+  {
+    "nekretnina": "Brane Crnčevića 3, stan 4",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "16.09.2026",
+    "haloStatus": "active",
+    "id": "prod050"
+  },
+  {
+    "nekretnina": "Viva B803",
+    "agent": "Anđela Vučić",
+    "vlasnik": "",
+    "datum": "29.09.2026",
+    "haloStatus": "active",
+    "id": "prod051"
+  },
+  {
+    "nekretnina": "Sakura Park_stan 18",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "23.09.2026",
+    "haloStatus": "active",
+    "id": "prod052"
+  },
+  {
+    "nekretnina": "Sakura Park_stan 49",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "29.09.2026",
+    "haloStatus": "active",
+    "id": "prod053"
+  },
+  {
+    "nekretnina": "BW-BON-A003",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "30.09.2026",
+    "haloStatus": "active",
+    "id": "prod054"
+  },
+  {
+    "nekretnina": "Voždov Kvart stan 66",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "02.10.2026",
+    "haloStatus": "active",
+    "id": "prod055"
+  },
+  {
+    "nekretnina": "Voždov Kvart stan 78",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "02.10.2026",
+    "haloStatus": "active",
+    "id": "prod056"
+  },
+  {
+    "nekretnina": "BW-IRS-004",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "05.10.2026",
+    "haloStatus": "active",
+    "id": "prod057"
+  },
+  {
+    "nekretnina": "BW-IRS-1406",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "06.10.2026",
+    "haloStatus": "active",
+    "id": "prod058"
+  },
+  {
+    "nekretnina": "Loznička 7, stan 1",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "06.10.2026",
+    "haloStatus": "active",
+    "id": "prod059"
+  },
+  {
+    "nekretnina": "BW-KIN-108",
+    "agent": "Sanja Stanojević",
+    "vlasnik": "",
+    "datum": "06.10.2026",
+    "haloStatus": "active",
+    "id": "prod060"
+  },
+  {
+    "nekretnina": "BW-RES-0906",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "07.10.2026",
+    "haloStatus": "active",
+    "id": "prod061"
+  },
+  {
+    "nekretnina": "Venizelosova 33g",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "",
+    "datum": "08.10.2026",
+    "haloStatus": "active",
+    "id": "prod062"
+  },
+  {
+    "nekretnina": "Sakura Park_Jurija Gagarina 19e_stan 63",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "08.10.2026",
+    "haloStatus": "active",
+    "id": "prod063"
+  },
+  {
+    "nekretnina": "Soul 64 B308",
+    "agent": "Slađana Vukmirović",
+    "vlasnik": "",
+    "datum": "08.10.2026",
+    "haloStatus": "active",
+    "id": "prod064"
+  },
+  {
+    "nekretnina": "Sakura Park_Jurija Gagarina 19e_stan 31",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "08.10.2026",
+    "haloStatus": "active",
+    "id": "prod065"
+  },
+  {
+    "nekretnina": "Pante Srećkovića 5",
+    "agent": "Ana Ralevski",
+    "vlasnik": "",
+    "datum": "12.10.2026",
+    "haloStatus": "active",
+    "id": "prod066"
+  },
+  {
+    "nekretnina": "BW-THA-1401",
+    "agent": "Nina Pena",
+    "vlasnik": "",
+    "datum": "12.10.2026",
+    "haloStatus": "active",
+    "id": "prod067"
+  },
+  {
+    "nekretnina": "Marine Veličković 18",
+    "agent": "Tijana Janković",
+    "vlasnik": "",
+    "datum": "13.10.2026",
+    "haloStatus": "active",
+    "id": "prod068"
+  },
+  {
+    "nekretnina": "Mihajlo Pređo",
+    "agent": "Sanja Stanojević",
+    "vlasnik": "",
+    "datum": "14.10.2026",
+    "haloStatus": "active",
+    "id": "prod069"
+  }
+]

@@ -1,0 +1,346 @@
+[
+  {
+    "nekretnina": "BW-VER-909",
+    "agent": "Sanja Stanojević",
+    "vlasnik": "Daniel Radonjić",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent001"
+  },
+  {
+    "nekretnina": "BW-QU1-A-116",
+    "agent": "Anđela Vučić",
+    "vlasnik": "Simka Radulović-Jevrić",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent002"
+  },
+  {
+    "nekretnina": "Južni bulevar stan S23",
+    "agent": "Anđela Vučić",
+    "vlasnik": "Zora Pozman",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent003"
+  },
+  {
+    "nekretnina": "Bulevar kralja Aleksandra 142B, stan broj A.2.3",
+    "agent": "Aleksandar",
+    "vlasnik": "Bojana Kujundžić",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent004"
+  },
+  {
+    "nekretnina": "BW-SI1-903",
+    "agent": "Jovana Angelovski",
+    "vlasnik": "Aleksandar Vučur",
+    "datum": "16.07.2026",
+    "haloStatus": "active",
+    "id": "rent005"
+  },
+  {
+    "nekretnina": "BW-LIB-808",
+    "agent": "Anđela Vučić",
+    "vlasnik": "Nenad Gavrić",
+    "datum": "",
+    "haloStatus": "hidden",
+    "id": "rent006"
+  },
+  {
+    "nekretnina": "Čika-Ljubina 1, stan 6",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Hans i Dušica Bibus",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent007"
+  },
+  {
+    "nekretnina": "BW-LIB-1401",
+    "agent": "Anđela Vučić",
+    "vlasnik": "Đorđe Đorđević",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent008"
+  },
+  {
+    "nekretnina": "Ljutice Bogdana 34",
+    "agent": "Ana Ralevski",
+    "vlasnik": "Miloš Vuković",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent009"
+  },
+  {
+    "nekretnina": "Rankeova 16_Stan 8",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Dragan Romić",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent010"
+  },
+  {
+    "nekretnina": "Airport Garden, Dolce vita Tošin bunar 224",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "SPORTSKI CENTAR VIZURA\n DOO BEOGRAD-NOVI BEOGRAD",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent011"
+  },
+  {
+    "nekretnina": "Malog Radojice 1_stan 1 i 2",
+    "agent": "Slađana Vukmirović",
+    "vlasnik": "Svetlana Vujović",
+    "datum": "17.07.2026",
+    "haloStatus": "active",
+    "id": "rent012"
+  },
+  {
+    "nekretnina": "BW-TB-6-6",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Kristian Pinter",
+    "datum": "21.07.2026",
+    "haloStatus": "active",
+    "id": "rent013"
+  },
+  {
+    "nekretnina": "BW-REG-3704",
+    "agent": "Anđela Vučić",
+    "vlasnik": "Mirko Novakovic",
+    "datum": "18.07.2026",
+    "haloStatus": "active",
+    "id": "rent014"
+  },
+  {
+    "nekretnina": "Soul 64 Q603",
+    "agent": "Anđela Vučić",
+    "vlasnik": "Mirjana Lončarević",
+    "datum": "20.07.2026",
+    "haloStatus": "active",
+    "id": "rent015"
+  },
+  {
+    "nekretnina": "BW-REG-3805",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Slavica Kecman",
+    "datum": "05.08.2026",
+    "haloStatus": "active",
+    "id": "rent016"
+  },
+  {
+    "nekretnina": "Tuniska 15, kuća 15 Žarka Vukovića Pucara",
+    "agent": "Milica Škorić",
+    "vlasnik": "Marko Mitrović",
+    "datum": "14.07.2026",
+    "haloStatus": "active",
+    "id": "rent017"
+  },
+  {
+    "nekretnina": "BW-REG-2405",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Jelena Stanković",
+    "datum": "16.07.2026",
+    "haloStatus": "active",
+    "id": "rent018"
+  },
+  {
+    "nekretnina": "K-District_stan 23",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Petar Zubac",
+    "datum": "22.07.2026",
+    "haloStatus": "active",
+    "id": "rent019"
+  },
+  {
+    "nekretnina": "BW-REG-2901",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Michael Feider",
+    "datum": "30.07.2026",
+    "haloStatus": "active",
+    "id": "rent020"
+  },
+  {
+    "nekretnina": "Soul 64 C503",
+    "agent": "Sanja Stanojević",
+    "vlasnik": "Lara Janković",
+    "datum": "30.07.2026",
+    "haloStatus": "active",
+    "id": "rent021"
+  },
+  {
+    "nekretnina": "Soul 64, stan A205",
+    "agent": "Jovana Angelovski",
+    "vlasnik": "Slavica Miljković",
+    "datum": "11.08.2026",
+    "haloStatus": "active",
+    "id": "rent022"
+  },
+  {
+    "nekretnina": "BW-VIS-2104",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Dejan Antonijević",
+    "datum": "17.08.2026",
+    "haloStatus": "active",
+    "id": "rent023"
+  },
+  {
+    "nekretnina": "Bulevar Mihaila Pupina 3, stan 75",
+    "agent": "Milica Radosavljević",
+    "vlasnik": "Isidora Knežević Krstić i Tijana Knežević Đurić",
+    "datum": "19.08.2026",
+    "haloStatus": "active",
+    "id": "rent024"
+  },
+  {
+    "nekretnina": "BW-QEN-310",
+    "agent": "Sanja Stanojević",
+    "vlasnik": "Ivana Drašković",
+    "datum": "19.08.2026",
+    "haloStatus": "active",
+    "id": "rent025"
+  },
+  {
+    "nekretnina": "SOUL 64_D308",
+    "agent": "Sanja Stanojević",
+    "vlasnik": "Bojan Ćirković",
+    "datum": "21.08.2026",
+    "haloStatus": "active",
+    "id": "rent026"
+  },
+  {
+    "nekretnina": "Istarska 30",
+    "agent": "Slađana Vukmirović",
+    "vlasnik": "Oliveru Jakovljević-Rialas",
+    "datum": "24.08.2026",
+    "haloStatus": "active",
+    "id": "rent027"
+  },
+  {
+    "nekretnina": "BW-THA-103",
+    "agent": "Sanja Stanojević",
+    "vlasnik": "Dejan Berković",
+    "datum": "15.09.2026",
+    "haloStatus": "active",
+    "id": "rent028"
+  },
+  {
+    "nekretnina": "Milovana Marinkovića 3, stan 1, 2 i 3",
+    "agent": "Tijana Janković",
+    "vlasnik": "Isidora Knežević Krstić",
+    "datum": "02.09.2026",
+    "haloStatus": "active",
+    "id": "rent029"
+  },
+  {
+    "nekretnina": "Terazije 43, stan 5",
+    "agent": "Milica Škorić",
+    "vlasnik": "Isidora Knežević Krstić i Tijana Knežević Đurić",
+    "datum": "03.09.2026",
+    "haloStatus": "active",
+    "id": "rent030"
+  },
+  {
+    "nekretnina": "BW St. Regis Residences 2005",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Jelena Jerotijević",
+    "datum": "",
+    "haloStatus": "kir",
+    "id": "rent031"
+  },
+  {
+    "nekretnina": "BW-RIV-308",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Jelena Jerotijević",
+    "datum": "",
+    "haloStatus": "kir",
+    "id": "rent032"
+  },
+  {
+    "nekretnina": "SOUL 64, stan B704",
+    "agent": "Milica Radosavljević",
+    "vlasnik": "Aleksandar Jovanović",
+    "datum": "30.09.2026",
+    "haloStatus": "active",
+    "id": "rent033"
+  },
+  {
+    "nekretnina": "Sakura Park_LOKAL",
+    "agent": "Nina Pena",
+    "vlasnik": "Goldberg Real Estate doo Beograd",
+    "datum": "28.09.2026",
+    "haloStatus": "active",
+    "id": "rent034"
+  },
+  {
+    "nekretnina": "Vajara Đoke Jovanovica 14_stan 2",
+    "agent": "Slađana Vukmirović",
+    "vlasnik": "Ljubiša Vučinić",
+    "datum": "30.09.2026",
+    "haloStatus": "active",
+    "id": "rent035"
+  },
+  {
+    "nekretnina": "Drinićka 2A",
+    "agent": "Ana Ralevski",
+    "vlasnik": "Aleksandar Milovanović",
+    "datum": "30.09.2026",
+    "haloStatus": "active",
+    "id": "rent036"
+  },
+  {
+    "nekretnina": "Mome Kapora 12_Merin plaza_stan 17",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Jelena Petrović",
+    "datum": "30.09.2026",
+    "haloStatus": "active",
+    "id": "rent037"
+  },
+  {
+    "nekretnina": "Vila Lavanda",
+    "agent": "Anđela Vučić",
+    "vlasnik": "Anja Freifrau Knyphausen_Mihaila Avramovića 43",
+    "datum": "",
+    "haloStatus": "active",
+    "id": "rent038"
+  },
+  {
+    "nekretnina": "Strahinjića Bana 17-19, stan br18",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Željka Demane Debih",
+    "datum": "28.09.2026",
+    "haloStatus": "active",
+    "id": "rent039"
+  },
+  {
+    "nekretnina": "Vlajkovićeva 16, stan 2",
+    "agent": "Marija Kostadinović",
+    "vlasnik": "Zotovic",
+    "datum": "06.10.2026",
+    "haloStatus": "active",
+    "id": "rent040"
+  },
+  {
+    "nekretnina": "Resavska 59_stan 3",
+    "agent": "Ana Ralevski",
+    "vlasnik": "Vićentije Petrović",
+    "datum": "07.10.2026",
+    "haloStatus": "active",
+    "id": "rent041"
+  },
+  {
+    "nekretnina": "Obalskih radnika 3",
+    "agent": "Ana Ralevski",
+    "vlasnik": "Renata Pindžo",
+    "datum": "12.10.2026",
+    "haloStatus": "active",
+    "id": "rent042"
+  },
+  {
+    "nekretnina": "Soul 64_E303",
+    "agent": "Jovana Angelovski",
+    "vlasnik": "Predrag Sredojević",
+    "datum": "12.10.2026",
+    "haloStatus": "active",
+    "id": "rent043"
+  }
+]
