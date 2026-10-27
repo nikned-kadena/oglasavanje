@@ -664,6 +664,7 @@ function switchMainTab(tab) {
   document.querySelectorAll('.tabs .tab').forEach((el, i) => {
     el.classList.toggle('active', allTabs[i]===tab);
   });
+  if (tab === 'nkr') renderNkrTable();
   if (tab === 'stats') renderStats();
 }
 
