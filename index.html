@@ -73,9 +73,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-danger{background:var(--red);color:#fff;border-color:var(--red)}
 
 /* TABLE */
-.table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:24px;max-height:calc(100vh - 220px);overflow-y:auto}
+.table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;overflow-y:auto;margin-bottom:24px;max-height:calc(100vh - 220px)}
 table{width:100%;border-collapse:collapse}
-th{background:var(--navy);color:rgba(255,255,255,.85);font-size:12px;font-weight:600;padding:10px 14px;text-align:left;white-space:nowrap;letter-spacing:.3px;position:sticky;top:0;z-index:2}
+th{background:var(--navy);color:rgba(255,255,255,.85);font-size:12px;font-weight:600;padding:10px 14px;text-align:left;white-space:nowrap;letter-spacing:.3px;position:sticky;top:0;z-index:1}
 td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#f8fafc}
@@ -225,11 +225,11 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 <!-- ============================================================ -->
 <div id="tab-nkr" class="content" style="display:none">
   <div class="sub-tabs">
-    <div class="sub-tab active" id="nkrSubRenta" onclick="switchNkrType('renta')">
-      RENTA <span class="badge" id="badgeNkrRenta">—</span>
+    <div class="sub-tab active" id="nkrSubResale" onclick="switchNkrType('resale')">
+      PRODAJA <span class="badge" id="badgeNkrResale">—</span>
     </div>
-    <div class="sub-tab" id="nkrSubResale" onclick="switchNkrType('resale')">
-      RESALE <span class="badge" id="badgeNkrResale">—</span>
+    <div class="sub-tab" id="nkrSubRenta" onclick="switchNkrType('renta')">
+      RENTA <span class="badge" id="badgeNkrRenta">—</span>
     </div>
     <div class="spacer"></div>
     <div class="filters">
@@ -519,7 +519,7 @@ let rules = {
 
 let currentMainTab = 'halo';
 let currentHaloType = 'prodaja';
-let currentNkrType = 'renta';
+let currentNkrType = 'resale';
 let haloFilter = 'sve';
 let nkrFilter = 'sve';
 let editingId = null;
@@ -907,11 +907,7 @@ function renderHaloTable() {
   const head = document.getElementById('haloTableHead');
   const body = document.getElementById('haloTableBody');
 
-  if (isProd) {
-    head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Halo status</th><th></th>';
-  } else {
-    head.innerHTML = '<th>Vlasnik</th><th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th></th>';
-  }
+  head.innerHTML = '<th>Vlasnik</th><th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Halo status</th><th></th>';
 
   const q = (document.getElementById('haloSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
@@ -940,7 +936,7 @@ function renderHaloTable() {
   });
 
   if (!rows.length) {
-    body.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>';
+    body.innerHTML = '<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>';
     updateHaloAlertBar(data);
     return;
   }
@@ -996,29 +992,17 @@ function renderHaloRow(r, isProd) {
   const haloChip = haloMap[r.haloStatus]||'—';
   const editBtn = `<button class="btn btn-sm" onclick="openEdit('${r.id}')">✏️</button>`;
 
-  if (isProd) {
-    return `<tr>
-      <td><strong>${r.nekretnina||'—'}</strong></td>
-      <td>${r.agent||'—'}</td>
-      <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
-      <td>${phaseBadge}</td>
-      <td>${actionCell}</td>
-      <td>${statusBadge}</td>
-      <td>${haloChip}</td>
-      <td>${editBtn}</td>
-    </tr>`;
-  } else {
-    return `<tr>
-      <td>${r.vlasnik||'—'}</td>
-      <td><strong>${r.nekretnina||'—'}</strong></td>
-      <td>${r.agent||'—'}</td>
-      <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
-      <td>${phaseBadge}</td>
-      <td>${actionCell}</td>
-      <td>${statusBadge}</td>
-      <td>${editBtn}</td>
-    </tr>`;
-  }
+  return `<tr>
+    <td>${r.vlasnik||'—'}</td>
+    <td><strong>${r.nekretnina||'—'}</strong></td>
+    <td>${r.agent||'—'}</td>
+    <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
+    <td>${phaseBadge}</td>
+    <td>${actionCell}</td>
+    <td>${statusBadge}</td>
+    <td>${haloChip}</td>
+    <td>${editBtn}</td>
+  </tr>`;
 }
 
 function updateHaloAlertBar(data) {
