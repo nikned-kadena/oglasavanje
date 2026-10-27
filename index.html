@@ -40,20 +40,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .alert-bar{background:var(--red);color:#fff;padding:10px 24px;font-size:13px;font-weight:600;display:none;align-items:center;gap:8px}
 .alert-bar.warn{background:var(--orange)}
 
-/* TABS */
+/* MAIN TABS */
 .tabs{background:var(--navy);padding:0 24px;display:flex;gap:2px}
 .tab{padding:10px 20px;color:rgba(255,255,255,.6);font-size:14px;cursor:pointer;border-bottom:3px solid transparent;transition:.15s}
 .tab:hover{color:#fff}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
 
 /* CONTENT */
-.content{padding:24px;max-width:1300px;margin:0 auto}
+.content{padding:24px;max-width:1400px;margin:0 auto}
 
 /* SECTION HEADER */
 .section-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .section-title{font-size:18px;font-weight:700;color:var(--navy)}
 .badge{background:var(--navy);color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
 .spacer{flex:1}
+
+/* SUB-TABS (within Halo / Nekretnine) */
+.sub-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.sub-tab{padding:7px 18px;border-radius:6px 6px 0 0;font-size:14px;cursor:pointer;border-bottom:3px solid transparent;color:rgba(27,58,107,.5);font-weight:500;transition:.15s}
+.sub-tab.active{background:var(--navy);color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+.sub-tab .badge{background:#ccc;color:#fff}
+.sub-tab.active .badge{background:var(--gold);color:#fff}
 
 /* FILTERS */
 .filters{display:flex;gap:8px;flex-wrap:wrap}
@@ -77,6 +84,7 @@ tr:hover td{background:#f8fafc}
 .phase{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .phase-premium,.phase-top{background:#fff3cd;color:#856404}
 .phase-standard{background:#d1ecf1;color:#0c5460}
+.phase-lite{background:#e8eaf6;color:#3949ab}
 .phase-expired{background:#f8d7da;color:#842029}
 .phase-kir{background:#e2e3e5;color:#383d41}
 .phase-hidden{background:#e2e3e5;color:#383d41}
@@ -89,7 +97,7 @@ tr:hover td{background:#f8fafc}
 .status-na{background:#f0f0f0;color:#888}
 
 /* STATS GRID */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
 .stat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;text-align:center}
 .stat-num{font-size:36px;font-weight:800;color:var(--navy);line-height:1}
 .stat-label{font-size:12px;color:var(--muted);margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
@@ -125,6 +133,9 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 .modal-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1}
 .modal-body{padding:20px}
 .modal-actions{padding:16px 20px;background:#f8f9fc;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+
+/* NAPOMENA CHIP */
+.napomena-chip{display:inline-block;background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:2px 8px;font-size:11px;color:#7c6000;margin-top:4px}
 
 /* LOADING */
 .loading{text-align:center;padding:48px;color:var(--muted)}
@@ -169,46 +180,82 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 <div class="alert-bar" id="alertBar"></div>
 
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('oglasi')">📋 Oglasi</div>
-  <div class="tab" onclick="switchTab('stats')">📊 Statistike</div>
-  <div class="tab" onclick="switchTab('pravila')">⚙️ Pravila</div>
+  <div class="tab active" onclick="switchMainTab('halo')">🏠 Halo Oglasi</div>
+  <div class="tab" onclick="switchMainTab('nkr')">🏢 Nekretnine.rs</div>
+  <div class="tab" onclick="switchMainTab('stats')">📊 Statistike</div>
+  <div class="tab" onclick="switchMainTab('pravila')">⚙️ Pravila</div>
 </div>
 
-<!-- OGLASI TAB -->
-<div id="tab-oglasi" class="content">
-  <div class="section-header">
-    <div class="tab-inner active" data-type="prodaja" onclick="switchType('prodaja')">
-      <span id="prodajaTabEl" class="tab" style="display:inline-block;background:var(--navy);color:var(--gold);border-bottom:3px solid var(--gold);padding:7px 18px;border-radius:6px 6px 0 0;cursor:pointer;font-weight:600;font-size:14px">PRODAJA <span class="badge" id="badgeProdaja">—</span></span>
+<!-- ============================================================ -->
+<!-- HALO TAB -->
+<!-- ============================================================ -->
+<div id="tab-halo" class="content">
+  <div class="sub-tabs">
+    <div class="sub-tab active" id="haloSubProdaja" onclick="switchHaloType('prodaja')">
+      PRODAJA <span class="badge" id="badgeProdaja">—</span>
     </div>
-    <div class="tab-inner" data-type="renta" onclick="switchType('renta')">
-      <span class="tab" style="display:inline-block;color:rgba(27,58,107,.5);padding:7px 18px;cursor:pointer;font-size:14px" id="rentaTabEl">RENTA <span class="badge" style="background:#ccc" id="badgeRenta">—</span></span>
+    <div class="sub-tab" id="haloSubRenta" onclick="switchHaloType('renta')">
+      RENTA <span class="badge" id="badgeRenta">—</span>
     </div>
     <div class="spacer"></div>
     <div class="filters">
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Pretraži..." id="searchInput" oninput="renderTable()" style="height:36px">
+        <input type="text" placeholder="Pretraži..." id="haloSearch" oninput="renderHaloTable()" style="height:36px">
       </div>
-      <button class="btn btn-sm active" id="filterAll" onclick="setFilter('sve')">Sve</button>
-      <button class="btn btn-sm" id="filterUrgent" onclick="setFilter('hitno')">🔴 Hitno</button>
-      <button class="btn btn-sm" id="filterSoon" onclick="setFilter('uskoro')">🟡 Uskoro</button>
-      <button class="btn btn-gold btn-sm" onclick="openAdd()">+ Dodaj oglas</button>
+      <button class="btn btn-sm active" id="haloFilterAll" onclick="setHaloFilter('sve')">Sve</button>
+      <button class="btn btn-sm" id="haloFilterUrgent" onclick="setHaloFilter('hitno')">🔴 Hitno</button>
+      <button class="btn btn-sm" id="haloFilterSoon" onclick="setHaloFilter('uskoro')">🟡 Uskoro</button>
+      <button class="btn btn-gold btn-sm" onclick="openHaloAdd()">+ Dodaj oglas</button>
     </div>
   </div>
 
   <div class="table-wrap">
     <table>
-      <thead>
-        <tr id="tableHead"></tr>
-      </thead>
-      <tbody id="tableBody">
+      <thead><tr id="haloTableHead"></tr></thead>
+      <tbody id="haloTableBody">
         <tr><td colspan="8"><div class="loading"><div class="spinner"></div>Učitavanje...</div></td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
+<!-- ============================================================ -->
+<!-- NEKRETNINE.RS TAB -->
+<!-- ============================================================ -->
+<div id="tab-nkr" class="content" style="display:none">
+  <div class="sub-tabs">
+    <div class="sub-tab active" id="nkrSubRenta" onclick="switchNkrType('renta')">
+      RENTA <span class="badge" id="badgeNkrRenta">—</span>
+    </div>
+    <div class="sub-tab" id="nkrSubResale" onclick="switchNkrType('resale')">
+      RESALE <span class="badge" id="badgeNkrResale">—</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="filters">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Pretraži..." id="nkrSearch" oninput="renderNkrTable()" style="height:36px">
+      </div>
+      <button class="btn btn-sm active" id="nkrFilterAll" onclick="setNkrFilter('sve')">Sve</button>
+      <button class="btn btn-sm" id="nkrFilterUrgent" onclick="setNkrFilter('hitno')">🔴 Hitno</button>
+      <button class="btn btn-sm" id="nkrFilterSoon" onclick="setNkrFilter('uskoro')">🟡 Uskoro</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr id="nkrTableHead"></tr></thead>
+      <tbody id="nkrTableBody">
+        <tr><td colspan="9"><div class="loading"><div class="spinner"></div>Učitavanje...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
 <!-- STATISTIKE TAB -->
+<!-- ============================================================ -->
 <div id="tab-stats" class="content" style="display:none">
   <div class="section-header">
     <div class="section-title">Statistike</div>
@@ -216,24 +263,36 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
   <div class="stats-grid" id="statsGrid"></div>
   <div class="charts-row">
     <div class="chart-card">
-      <div class="chart-title">Prodaja – Po fazi</div>
+      <div class="chart-title">Halo – Prodaja po fazi</div>
       <div id="chartProdaja"></div>
     </div>
     <div class="chart-card">
-      <div class="chart-title">Renta – Po fazi</div>
+      <div class="chart-title">Halo – Renta po fazi</div>
       <div id="chartRenta"></div>
+    </div>
+  </div>
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Nekretnine.rs – Renta po fazi</div>
+      <div id="chartNkrRenta"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Nekretnine.rs – Resale po fazi</div>
+      <div id="chartNkrResale"></div>
     </div>
   </div>
 </div>
 
+<!-- ============================================================ -->
 <!-- PRAVILA TAB -->
+<!-- ============================================================ -->
 <div id="tab-pravila" class="content" style="display:none">
   <div class="section-header">
     <div class="section-title">Konfiguracija pravila</div>
   </div>
 
   <div class="info-box">
-    <strong>Napomena:</strong> Pravila se čuvaju lokalno u tvom pregledaču (localStorage). Svaki korisnik može podesiti svoje vrednosti. Podrazumevane vrednosti: Prodaja – Premium 15d×2, Standard 30d; Renta – Top 15d×2, Standard 30d.
+    <strong>Napomena:</strong> Pravila se čuvaju lokalno u tvom pregledaču (localStorage). Svaki korisnik može podesiti svoje vrednosti.
   </div>
 
   <div class="rules-card">
@@ -276,13 +335,33 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
     </div>
   </div>
 
+  <div class="rules-card">
+    <div class="rules-title">🏢 Nekretnine.rs – Renta i Resale</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Premium trajanje (dani)</label>
+        <input type="number" id="r_nkrPremDays" min="1" max="90" value="30">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Standard trajanje (dani)</label>
+        <input type="number" id="r_nkrStdDays" min="1" max="90" value="30">
+      </div>
+      <div class="form-group">
+        <label>Lite trajanje (dani)</label>
+        <input type="number" id="r_nkrLiteDays" min="1" max="90" value="30">
+      </div>
+    </div>
+  </div>
+
   <div class="form-actions">
     <button class="btn btn-gold" onclick="saveRules()">💾 Sačuvaj pravila</button>
     <span class="save-note" id="saveNote">✓ Sačuvano!</span>
   </div>
 </div>
 
-<!-- ADD/EDIT MODAL -->
+<!-- ADD/EDIT MODAL (Halo) -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="modal-head">
@@ -291,11 +370,9 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
     </div>
     <div class="modal-body">
       <input type="hidden" id="editId">
-
       <div class="info-box" id="editInfoBox" style="display:none">
-        ℹ️ Izmene se čuvaju lokalno u tvom pregledaču. Da ažuriraš podatke za sve korisnike, potrebno je ažurirati JSON fajl u GitHub repozitorijumu.
+        ℹ️ Izmene se čuvaju lokalno u tvom pregledaču. Za ažuriranje za sve korisnike, update-uj JSON fajl u GitHub repozitorijumu.
       </div>
-
       <div class="form-row" style="margin-top:4px">
         <div class="form-group">
           <label>Tip oglasa</label>
@@ -324,7 +401,7 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Prodavac / Agent</label>
+          <label>Agent</label>
           <input type="text" id="fAgent" placeholder="Ime agenta">
         </div>
         <div class="form-group">
@@ -345,18 +422,26 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 // ============================================================
 // STATE
 // ============================================================
-let prodajaBase = [];   // loaded from data/prodaja.json
-let rentaBase = [];     // loaded from data/renta.json
-let localEdits = {};    // localStorage overrides: { "prodaja": [...], "renta": [...] }
+// Halo
+let prodajaBase = [], rentaBase = [];
+let prodajaData = [], rentaData = [];
+let localEdits = {};
 
-let prodajaData = [];   // merged: base + local
-let rentaData = [];
+// Nekretnine.rs
+let nkrRentaBase = [], nkrResaleBase = [];
+let nkrRentaData = [], nkrResaleData = [];
 
-let rules = { premDays:15, premRep:2, stdDaysProd:30, topDays:15, topRep:2, stdDaysRenta:30 };
+let rules = {
+  premDays:15, premRep:2, stdDaysProd:30,
+  topDays:15, topRep:2, stdDaysRenta:30,
+  nkrPremDays:30, nkrStdDays:30, nkrLiteDays:30
+};
 
-let currentType = 'prodaja';
-let currentFilter = 'sve';
-let currentTab = 'oglasi';
+let currentMainTab = 'halo';
+let currentHaloType = 'prodaja';
+let currentNkrType = 'renta';
+let haloFilter = 'sve';
+let nkrFilter = 'sve';
 let editingId = null;
 
 // ============================================================
@@ -378,61 +463,56 @@ function saveLocalEdits() {
   try { localStorage.setItem(LS_EDITS, JSON.stringify(localEdits)); } catch(e) {}
 }
 
-function mergeData() {
-  // Start from base, apply local overrides
+function mergeHaloData() {
   const pEdits = (localEdits.prodaja || []);
   const rEdits = (localEdits.renta || []);
-
-  // Merge: local additions + edits override base; local deletions remove from base
   const pDeleted = new Set((localEdits.prodaja_deleted || []));
   const rDeleted = new Set((localEdits.renta_deleted || []));
   const pLocalIds = new Set(pEdits.map(r=>r.id));
   const rLocalIds = new Set(rEdits.map(r=>r.id));
-
-  // Base records not overridden and not deleted
   const pBase = prodajaBase.filter(r => !pLocalIds.has(r.id) && !pDeleted.has(r.id));
   const rBase = rentaBase.filter(r => !rLocalIds.has(r.id) && !rDeleted.has(r.id));
-
-  // Local edits that are updates (exist in base) + new records (not in base)
   prodajaData = [...pBase, ...pEdits].filter(r => !pDeleted.has(r.id));
   rentaData = [...rBase, ...rEdits].filter(r => !rDeleted.has(r.id));
 }
 
 // ============================================================
-// INIT – load JSON
+// INIT
 // ============================================================
 async function init() {
   loadLocalStorage();
   renderRulesForm();
 
   try {
-    const [prodResp, rentaResp] = await Promise.all([
+    const [prodResp, rentaResp, nkrRentaResp, nkrResaleResp] = await Promise.all([
       fetch('data/prodaja.json'),
-      fetch('data/renta.json')
+      fetch('data/renta.json'),
+      fetch('data/nkr_renta.json'),
+      fetch('data/nkr_resale.json')
     ]);
     prodajaBase = await prodResp.json();
     rentaBase = await rentaResp.json();
+    nkrRentaBase = await nkrRentaResp.json();
+    nkrResaleBase = await nkrResaleResp.json();
+    nkrRentaData = [...nkrRentaBase];
+    nkrResaleData = [...nkrResaleBase];
 
-    // Set last-updated from GitHub Pages deploy time (fallback: current date)
     const lu = document.getElementById('lastUpdated');
     if (lu) {
       try {
         const resp = await fetch('data/updated.txt');
-        const txt = (await resp.text()).trim();
-        lu.textContent = 'Podaci: ' + txt;
-      } catch(e) {
-        lu.textContent = 'Podaci učitani';
-      }
+        lu.textContent = 'Podaci: ' + (await resp.text()).trim();
+      } catch(e) { lu.textContent = 'Podaci učitani'; }
     }
   } catch(e) {
-    console.error('Greška pri učitavanju podataka:', e);
-    document.getElementById('tableBody').innerHTML =
-      '<tr><td colspan="8"><div class="empty"><div class="empty-icon">⚠️</div>Nije moguće učitati podatke. Pokušaj ponovo.</div></td></tr>';
+    console.error('Greška pri učitavanju:', e);
+    document.getElementById('haloTableBody').innerHTML =
+      '<tr><td colspan="8"><div class="empty"><div class="empty-icon">⚠️</div>Nije moguće učitati podatke.</div></td></tr>';
     return;
   }
 
-  mergeData();
-  renderTable();
+  mergeHaloData();
+  renderHaloTable();
   updateBadges();
 }
 
@@ -475,9 +555,9 @@ function parseDate(str) {
 }
 
 // ============================================================
-// SCHEDULE COMPUTATION
+// HALO – SCHEDULE COMPUTATION
 // ============================================================
-function computeSchedule(startISO, type) {
+function computeHaloSchedule(startISO, type) {
   const s = parseDate(startISO);
   if (!s) return null;
   const phases = [];
@@ -520,60 +600,136 @@ function nextAction(phases) {
   const t = today();
   for (const p of phases) {
     if (p.renew && t <= p.renew) {
-      const d = diffDays(t, p.renew);
-      return { date:p.renew, days:d, phase:p.phase };
+      return { date:p.renew, days:diffDays(t, p.renew), phase:p.phase };
     }
   }
   return null;
 }
 
 // ============================================================
-// TABS
+// NEKRETNINE.RS – PHASE from explicit dates
 // ============================================================
-function switchTab(tab) {
-  currentTab = tab;
-  ['oglasi','stats','pravila'].forEach(t => {
+function nkrCurrentPhase(r) {
+  // r has: premium (date or null), standard (date or null), lite (date or null)
+  // Each is a start date; duration from rules
+  const t = today();
+  const premStart = parseDate(r.premium);
+  const stdStart = parseDate(r.standard);
+  const liteStart = parseDate(r.lite);
+
+  const premDur = rules.nkrPremDays || 30;
+  const stdDur = rules.nkrStdDays || 30;
+  const liteDur = rules.nkrLiteDays || 30;
+
+  if (liteStart) {
+    const liteEnd = addDays(liteStart, liteDur - 1);
+    if (t >= liteStart && t <= liteEnd) return { phase:'Lite', end:liteEnd };
+    if (t > liteEnd) return { phase:'Expired', end:null };
+  }
+  if (stdStart) {
+    const stdEnd = addDays(stdStart, stdDur - 1);
+    if (t >= stdStart && t <= stdEnd) return { phase:'Standard', end:stdEnd };
+    if (!liteStart && t > stdEnd) return { phase:'Expired', end:null };
+  }
+  if (premStart) {
+    const premEnd = addDays(premStart, premDur - 1);
+    if (t >= premStart && t <= premEnd) return { phase:'Premium', end:premEnd };
+    if (!stdStart && !liteStart && t > premEnd) return { phase:'Expired', end:null };
+  }
+  return null;
+}
+
+function nkrNextTransition(r) {
+  // Returns next date to act (switch phase) and what to switch to
+  const t = today();
+  const premStart = parseDate(r.premium);
+  const stdStart = parseDate(r.standard);
+  const liteStart = parseDate(r.lite);
+  const premDur = rules.nkrPremDays || 30;
+  const stdDur = rules.nkrStdDays || 30;
+
+  if (premStart && !stdStart) {
+    const premEnd = addDays(premStart, premDur);
+    if (t <= premEnd) return { date:premEnd, days:diffDays(t, premEnd), to:'Standard' };
+  }
+  if (stdStart && !liteStart) {
+    const stdEnd = addDays(stdStart, stdDur);
+    if (t <= stdEnd) return { date:stdEnd, days:diffDays(t, stdEnd), to:'Lite' };
+  }
+  return null;
+}
+
+// ============================================================
+// MAIN TABS
+// ============================================================
+function switchMainTab(tab) {
+  currentMainTab = tab;
+  const allTabs = ['halo','nkr','stats','pravila'];
+  allTabs.forEach(t => {
     document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
   });
-  document.querySelectorAll('.tabs .tab').forEach((el,i) => {
-    const tabs = ['oglasi','stats','pravila'];
-    el.classList.toggle('active', tabs[i]===tab);
+  document.querySelectorAll('.tabs .tab').forEach((el, i) => {
+    el.classList.toggle('active', allTabs[i]===tab);
   });
   if (tab === 'stats') renderStats();
 }
 
-function switchType(type) {
-  currentType = type;
-  const prod = document.getElementById('prodajaTabEl');
-  const rent = document.getElementById('rentaTabEl');
-  const activeStyle = 'display:inline-block;background:var(--navy);color:var(--gold);border-bottom:3px solid var(--gold);padding:7px 18px;border-radius:6px 6px 0 0;cursor:pointer;font-weight:600;font-size:14px';
-  const inactiveStyle = 'display:inline-block;color:rgba(27,58,107,.5);padding:7px 18px;cursor:pointer;font-size:14px';
-  prod.style.cssText = type==='prodaja' ? activeStyle : inactiveStyle;
-  rent.style.cssText = type==='renta' ? activeStyle : inactiveStyle;
-  renderTable();
+// ============================================================
+// HALO TABS
+// ============================================================
+function switchHaloType(type) {
+  currentHaloType = type;
+  document.getElementById('haloSubProdaja').classList.toggle('active', type==='prodaja');
+  document.getElementById('haloSubRenta').classList.toggle('active', type==='renta');
+  renderHaloTable();
 }
 
-function setFilter(f) {
-  currentFilter = f;
-  document.getElementById('filterAll').classList.toggle('active', f==='sve');
-  document.getElementById('filterUrgent').classList.toggle('active', f==='hitno');
-  document.getElementById('filterSoon').classList.toggle('active', f==='uskoro');
-  renderTable();
+function setHaloFilter(f) {
+  haloFilter = f;
+  document.getElementById('haloFilterAll').classList.toggle('active', f==='sve');
+  document.getElementById('haloFilterUrgent').classList.toggle('active', f==='hitno');
+  document.getElementById('haloFilterSoon').classList.toggle('active', f==='uskoro');
+  renderHaloTable();
+}
+
+function openHaloAdd() { openAdd(); }
+
+// ============================================================
+// NKR TABS
+// ============================================================
+function switchNkrType(type) {
+  currentNkrType = type;
+  document.getElementById('nkrSubRenta').classList.toggle('active', type==='renta');
+  document.getElementById('nkrSubResale').classList.toggle('active', type==='resale');
+  renderNkrTable();
+}
+
+function setNkrFilter(f) {
+  nkrFilter = f;
+  document.getElementById('nkrFilterAll').classList.toggle('active', f==='sve');
+  document.getElementById('nkrFilterUrgent').classList.toggle('active', f==='hitno');
+  document.getElementById('nkrFilterSoon').classList.toggle('active', f==='uskoro');
+  renderNkrTable();
 }
 
 // ============================================================
-// TABLE
+// BADGES
 // ============================================================
 function updateBadges() {
   document.getElementById('badgeProdaja').textContent = prodajaData.filter(r=>r.haloStatus==='active'||r.haloStatus==='never_remove').length;
   document.getElementById('badgeRenta').textContent = rentaData.filter(r=>r.haloStatus==='active'||r.haloStatus==='never_remove').length;
+  document.getElementById('badgeNkrRenta').textContent = nkrRentaData.length;
+  document.getElementById('badgeNkrResale').textContent = nkrResaleData.length;
 }
 
-function renderTable() {
-  const isProd = currentType === 'prodaja';
+// ============================================================
+// HALO TABLE
+// ============================================================
+function renderHaloTable() {
+  const isProd = currentHaloType === 'prodaja';
   const data = isProd ? prodajaData : rentaData;
-  const head = document.getElementById('tableHead');
-  const body = document.getElementById('tableBody');
+  const head = document.getElementById('haloTableHead');
+  const body = document.getElementById('haloTableBody');
 
   if (isProd) {
     head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Halo status</th><th></th>';
@@ -581,58 +737,53 @@ function renderTable() {
     head.innerHTML = '<th>Vlasnik</th><th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th></th>';
   }
 
-  const q = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  const q = (document.getElementById('haloSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
     const s = `${r.nekretnina||''} ${r.agent||''} ${r.vlasnik||''}`.toLowerCase();
     return !q || s.includes(q);
   });
 
-  if (currentFilter === 'hitno') {
+  if (haloFilter === 'hitno') {
     rows = rows.filter(r => {
       if (r.haloStatus !== 'active' && r.haloStatus !== 'never_remove') return false;
-      const sch = computeSchedule(r.datum, currentType);
-      const na = nextAction(sch);
+      const na = nextAction(computeHaloSchedule(r.datum, currentHaloType));
       return na && na.days <= 2;
     });
-  } else if (currentFilter === 'uskoro') {
+  } else if (haloFilter === 'uskoro') {
     rows = rows.filter(r => {
       if (r.haloStatus !== 'active' && r.haloStatus !== 'never_remove') return false;
-      const sch = computeSchedule(r.datum, currentType);
-      const na = nextAction(sch);
+      const na = nextAction(computeHaloSchedule(r.datum, currentHaloType));
       return na && na.days > 2 && na.days <= 7;
     });
   }
 
-  if (!rows.length) {
-    body.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>';
-    updateAlertBar(data);
-    return;
-  }
-
   rows.sort((a,b) => {
-    const na = nextAction(computeSchedule(a.datum, currentType));
-    const nb = nextAction(computeSchedule(b.datum, currentType));
+    const na = nextAction(computeHaloSchedule(a.datum, currentHaloType));
+    const nb = nextAction(computeHaloSchedule(b.datum, currentHaloType));
     return (na?na.days:9999) - (nb?nb.days:9999);
   });
 
-  body.innerHTML = rows.map(r => renderRow(r, isProd)).join('');
-  updateAlertBar(data);
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>';
+    updateHaloAlertBar(data);
+    return;
+  }
+
+  body.innerHTML = rows.map(r => renderHaloRow(r, isProd)).join('');
+  updateHaloAlertBar(data);
 }
 
-function renderRow(r, isProd) {
+function renderHaloRow(r, isProd) {
   const type = isProd ? 'prodaja' : 'renta';
-  const sch = computeSchedule(r.datum, type);
+  const sch = computeHaloSchedule(r.datum, type);
   const cp = currentPhase(sch);
   const na = nextAction(sch);
 
   let phaseBadge = '—';
-  if (r.haloStatus === 'kir') {
-    phaseBadge = '<span class="phase phase-kir">KIR/NK</span>';
-  } else if (r.haloStatus === 'hidden') {
-    phaseBadge = '<span class="phase phase-hidden">Sakriven</span>';
-  } else if (r.haloStatus === 'never_remove') {
-    phaseBadge = '<span class="phase phase-standard">Uvek aktivan</span>';
-  } else if (cp) {
+  if (r.haloStatus === 'kir') phaseBadge = '<span class="phase phase-kir">KIR/NK</span>';
+  else if (r.haloStatus === 'hidden') phaseBadge = '<span class="phase phase-hidden">Sakriven</span>';
+  else if (r.haloStatus === 'never_remove') phaseBadge = '<span class="phase phase-standard">Uvek aktivan</span>';
+  else if (cp) {
     if (cp.phase==='Expired') phaseBadge = '<span class="phase phase-expired">Istekao</span>';
     else if (cp.phase==='Premium') phaseBadge = '<span class="phase phase-premium">Premium</span>';
     else if (cp.phase==='Top') phaseBadge = '<span class="phase phase-top">Top</span>';
@@ -694,26 +845,23 @@ function renderRow(r, isProd) {
   }
 }
 
-function updateAlertBar(data) {
+function updateHaloAlertBar(data) {
   const bar = document.getElementById('alertBar');
-  const type = currentType;
+  const type = currentHaloType;
   const urgent = data.filter(r => {
     if (r.haloStatus !== 'active') return false;
-    const na = nextAction(computeSchedule(r.datum, type));
+    const na = nextAction(computeHaloSchedule(r.datum, type));
     return na && na.days <= 1;
   });
   const expired = data.filter(r => {
     if (r.haloStatus !== 'active') return false;
-    const cp = currentPhase(computeSchedule(r.datum, type));
-    return cp?.phase === 'Expired';
+    return currentPhase(computeHaloSchedule(r.datum, type))?.phase === 'Expired';
   });
   if (expired.length) {
-    bar.style.display='flex';
-    bar.className='alert-bar';
+    bar.style.display='flex'; bar.className='alert-bar';
     bar.textContent = `⚠ ${expired.length} oglas${expired.length>1?'a':''} je istekao – potrebna je obnova!`;
   } else if (urgent.length) {
-    bar.style.display='flex';
-    bar.className='alert-bar warn';
+    bar.style.display='flex'; bar.className='alert-bar warn';
     bar.textContent = `⏰ ${urgent.length} oglas${urgent.length>1?'a':''} ističe danas ili sutra – obnovi na Halo!`;
   } else {
     bar.style.display='none';
@@ -721,58 +869,172 @@ function updateAlertBar(data) {
 }
 
 // ============================================================
+// NEKRETNINE.RS TABLE
+// ============================================================
+function renderNkrTable() {
+  const isRenta = currentNkrType === 'renta';
+  const data = isRenta ? nkrRentaData : nkrResaleData;
+  const head = document.getElementById('nkrTableHead');
+  const body = document.getElementById('nkrTableBody');
+
+  if (isRenta) {
+    head.innerHTML = '<th>Vlasnik</th><th>Nekretnina</th><th>Cena</th><th>Agent</th><th>Premium</th><th>Standard</th><th>Lite</th><th>Faza</th><th>Status</th>';
+  } else {
+    head.innerHTML = '<th>Nekretnina</th><th>Cena</th><th>Agent</th><th>Premium</th><th>Standard</th><th>Lite</th><th>Faza</th><th>Status</th><th>Napomena</th>';
+  }
+
+  const q = (document.getElementById('nkrSearch')?.value||'').toLowerCase();
+  let rows = data.filter(r => {
+    const s = `${r.nekretnina||''} ${r.agent||''} ${r.vlasnik||''}`.toLowerCase();
+    return !q || s.includes(q);
+  });
+
+  if (nkrFilter === 'hitno') {
+    rows = rows.filter(r => {
+      const nt = nkrNextTransition(r);
+      return nt && nt.days <= 2;
+    });
+  } else if (nkrFilter === 'uskoro') {
+    rows = rows.filter(r => {
+      const nt = nkrNextTransition(r);
+      return nt && nt.days > 2 && nt.days <= 7;
+    });
+  }
+
+  rows.sort((a,b) => {
+    const na = nkrNextTransition(a);
+    const nb = nkrNextTransition(b);
+    return (na?na.days:9999) - (nb?nb.days:9999);
+  });
+
+  if (!rows.length) {
+    const colspan = isRenta ? 9 : 9;
+    body.innerHTML = `<tr><td colspan="${colspan}"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>`;
+    return;
+  }
+
+  body.innerHTML = rows.map(r => renderNkrRow(r, isRenta)).join('');
+}
+
+function renderNkrRow(r, isRenta) {
+  const cp = nkrCurrentPhase(r);
+  const nt = nkrNextTransition(r);
+
+  let phaseBadge = '—';
+  if (cp) {
+    if (cp.phase === 'Expired') phaseBadge = '<span class="phase phase-expired">Istekao</span>';
+    else if (cp.phase === 'Premium') phaseBadge = '<span class="phase phase-premium">Premium</span>';
+    else if (cp.phase === 'Standard') phaseBadge = '<span class="phase phase-standard">Standard</span>';
+    else if (cp.phase === 'Lite') phaseBadge = '<span class="phase phase-lite">Lite</span>';
+  } else if (!r.premium && !r.standard && !r.lite) {
+    phaseBadge = '<span style="color:var(--muted);font-size:12px">Bez datuma</span>';
+  }
+
+  let statusBadge = '<span class="status status-na">—</span>';
+  if (cp?.phase === 'Expired') {
+    statusBadge = '<span class="status status-urgent">⚠ Istekao</span>';
+  } else if (nt) {
+    const d = nt.days;
+    if (d <= 0) statusBadge = '<span class="status status-urgent">🔴 DANAS</span>';
+    else if (d <= 2) statusBadge = '<span class="status status-urgent">🔴 Hitno</span>';
+    else if (d <= 7) statusBadge = '<span class="status status-soon">🟡 Uskoro</span>';
+    else statusBadge = '<span class="status status-ok">✓ OK</span>';
+  } else if (cp && cp.phase !== 'Expired') {
+    statusBadge = '<span class="status status-ok">✓ OK</span>';
+  }
+
+  const fmtPhaseDate = (d) => d ? `<span style="font-size:12px">${d}</span>` : '<span style="color:var(--muted)">—</span>';
+  const napomena = r.napomena ? `<span class="napomena-chip">${r.napomena}</span>` : '—';
+  const cena = r.cena ? `<span style="font-size:12px;color:var(--navy)">${r.cena}</span>` : '—';
+
+  if (isRenta) {
+    return `<tr>
+      <td style="font-size:12px">${r.vlasnik||'—'}</td>
+      <td><strong>${r.nekretnina||'—'}</strong></td>
+      <td style="white-space:nowrap">${cena}</td>
+      <td style="font-size:12px">${r.agent||'—'}</td>
+      <td>${fmtPhaseDate(r.premium)}</td>
+      <td>${fmtPhaseDate(r.standard)}</td>
+      <td>${fmtPhaseDate(r.lite)}</td>
+      <td>${phaseBadge}</td>
+      <td>${statusBadge}</td>
+    </tr>`;
+  } else {
+    return `<tr>
+      <td><strong>${r.nekretnina||'—'}</strong></td>
+      <td style="white-space:nowrap">${cena}</td>
+      <td style="font-size:12px">${r.agent||'—'}</td>
+      <td>${fmtPhaseDate(r.premium)}</td>
+      <td>${fmtPhaseDate(r.standard)}</td>
+      <td>${fmtPhaseDate(r.lite)}</td>
+      <td>${phaseBadge}</td>
+      <td>${statusBadge}</td>
+      <td>${napomena}</td>
+    </tr>`;
+  }
+}
+
+// ============================================================
 // STATS
 // ============================================================
 function renderStats() {
-  function countPhases(data, type) {
+  function countHaloPhases(data, type) {
     const counts = {};
     data.forEach(r => {
       if (r.haloStatus === 'kir' || r.haloStatus === 'hidden') return;
-      const sch = computeSchedule(r.datum, type);
-      const cp = currentPhase(sch);
+      const cp = currentPhase(computeHaloSchedule(r.datum, type));
       const ph = r.haloStatus === 'never_remove' ? 'Uvek aktivan' : (cp?.phase || 'Bez datuma');
       counts[ph] = (counts[ph]||0) + 1;
     });
     return counts;
   }
 
-  const totalActive = (data) => data.filter(x => x.haloStatus==='active'||x.haloStatus==='never_remove').length;
-  const totalExpired = (data, type) => data.filter(r => {
-    if (r.haloStatus!=='active') return false;
-    return currentPhase(computeSchedule(r.datum, type))?.phase === 'Expired';
-  }).length;
+  function countNkrPhases(data) {
+    const counts = {};
+    data.forEach(r => {
+      const cp = nkrCurrentPhase(r);
+      const ph = cp?.phase || 'Bez datuma';
+      counts[ph] = (counts[ph]||0) + 1;
+    });
+    return counts;
+  }
 
-  const pcProd = countPhases(prodajaData, 'prodaja');
-  const pcRenta = countPhases(rentaData, 'renta');
+  const totalActive = (data) => data.filter(x => x.haloStatus==='active'||x.haloStatus==='never_remove').length;
+  const totalExp = (data, type) => data.filter(r => {
+    if (r.haloStatus!=='active') return false;
+    return currentPhase(computeHaloSchedule(r.datum, type))?.phase === 'Expired';
+  }).length;
 
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card">
-      <div class="stat-num">${prodajaData.length + rentaData.length}</div>
+      <div class="stat-num">${prodajaData.length + rentaData.length + nkrRentaData.length + nkrResaleData.length}</div>
       <div class="stat-label">Ukupno oglasa</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" style="color:#1B3A6B">${prodajaData.length}</div>
-      <div class="stat-label">Prodaja</div>
-      <div class="stat-sub">${totalActive(prodajaData)} aktivnih na Halo</div>
+      <div class="stat-num" style="color:var(--navy)">${prodajaData.length + rentaData.length}</div>
+      <div class="stat-label">Halo oglasi</div>
+      <div class="stat-sub">${totalActive(prodajaData)+totalActive(rentaData)} aktivnih</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" style="color:#C9A84C">${rentaData.length}</div>
-      <div class="stat-label">Renta</div>
-      <div class="stat-sub">${totalActive(rentaData)} aktivnih na Halo</div>
+      <div class="stat-num" style="color:#5c6bc0">${nkrRentaData.length + nkrResaleData.length}</div>
+      <div class="stat-label">Nekretnine.rs</div>
+      <div class="stat-sub">${nkrRentaData.length} renta + ${nkrResaleData.length} resale</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" style="color:var(--red)">${totalExpired(prodajaData,'prodaja')+totalExpired(rentaData,'renta')}</div>
-      <div class="stat-label">Isteklo</div>
+      <div class="stat-num" style="color:var(--red)">${totalExp(prodajaData,'prodaja')+totalExp(rentaData,'renta')}</div>
+      <div class="stat-label">Isteklo (Halo)</div>
       <div class="stat-sub">Potrebna obnova</div>
     </div>
   `;
 
-  renderBarChart('chartProdaja', pcProd, prodajaData.length || 1);
-  renderBarChart('chartRenta', pcRenta, rentaData.length || 1);
+  renderBarChart('chartProdaja', countHaloPhases(prodajaData, 'prodaja'), prodajaData.length || 1);
+  renderBarChart('chartRenta', countHaloPhases(rentaData, 'renta'), rentaData.length || 1);
+  renderBarChart('chartNkrRenta', countNkrPhases(nkrRentaData), nkrRentaData.length || 1);
+  renderBarChart('chartNkrResale', countNkrPhases(nkrResaleData), nkrResaleData.length || 1);
 }
 
 function renderBarChart(containerId, counts, total) {
-  const colors = { Premium:'#856404', Top:'#856404', Standard:'#0c5460', Expired:'#842029', 'Uvek aktivan':'#0c6634', 'Bez datuma':'#888' };
+  const colors = { Premium:'#856404', Top:'#856404', Standard:'#0c5460', Lite:'#3949ab', Expired:'#842029', 'Uvek aktivan':'#0c6634', 'Bez datuma':'#888' };
   const container = document.getElementById(containerId);
   if (!counts || Object.keys(counts).length === 0) {
     container.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Nema podataka</div>';
@@ -797,7 +1059,7 @@ function renderBarChart(containerId, counts, total) {
 // RULES
 // ============================================================
 function renderRulesForm() {
-  const ids = ['premDays','premRep','stdDaysProd','topDays','topRep','stdDaysRenta'];
+  const ids = ['premDays','premRep','stdDaysProd','topDays','topRep','stdDaysRenta','nkrPremDays','nkrStdDays','nkrLiteDays'];
   ids.forEach(id => {
     const el = document.getElementById('r_'+id);
     if (el && rules[id] !== undefined) el.value = rules[id];
@@ -812,23 +1074,27 @@ function saveRules() {
     topDays: +document.getElementById('r_topDays').value || 15,
     topRep: +document.getElementById('r_topRep').value || 2,
     stdDaysRenta: +document.getElementById('r_stdDaysRenta').value || 30,
+    nkrPremDays: +document.getElementById('r_nkrPremDays').value || 30,
+    nkrStdDays: +document.getElementById('r_nkrStdDays').value || 30,
+    nkrLiteDays: +document.getElementById('r_nkrLiteDays').value || 30,
   };
   Object.assign(rules, newRules);
   try { localStorage.setItem(LS_RULES, JSON.stringify(newRules)); } catch(e) {}
   const note = document.getElementById('saveNote');
   note.style.display='inline';
   setTimeout(()=>note.style.display='none', 2500);
-  renderTable();
+  renderHaloTable();
+  renderNkrTable();
 }
 
 // ============================================================
-// ADD / EDIT MODAL (local edits)
+// HALO MODAL
 // ============================================================
 function openAdd() {
   editingId = null;
   document.getElementById('modalTitle').textContent = 'Dodaj oglas (lokalno)';
   document.getElementById('editId').value = '';
-  document.getElementById('fType').value = currentType;
+  document.getElementById('fType').value = currentHaloType;
   document.getElementById('fHaloStatus').value = 'active';
   document.getElementById('fNekretnina').value = '';
   document.getElementById('fAgent').value = '';
@@ -840,13 +1106,13 @@ function openAdd() {
 }
 
 function openEdit(id) {
-  const data = currentType==='prodaja' ? prodajaData : rentaData;
+  const data = currentHaloType==='prodaja' ? prodajaData : rentaData;
   const r = data.find(x=>x.id===id);
   if (!r) return;
   editingId = id;
   document.getElementById('modalTitle').textContent = 'Izmeni oglas (lokalno)';
   document.getElementById('editId').value = id;
-  document.getElementById('fType').value = currentType;
+  document.getElementById('fType').value = currentHaloType;
   document.getElementById('fHaloStatus').value = r.haloStatus||'active';
   document.getElementById('fNekretnina').value = r.nekretnina||'';
   document.getElementById('fAgent').value = r.agent||'';
@@ -887,8 +1153,8 @@ function saveAd() {
   }
 
   saveLocalEdits();
-  mergeData();
-  renderTable();
+  mergeHaloData();
+  renderHaloTable();
   updateBadges();
   closeModal();
 }
@@ -896,21 +1162,15 @@ function saveAd() {
 function deleteAd() {
   if (!editingId) return;
   if (!confirm('Obriši ovaj oglas lokalno?')) return;
-  const type = currentType;
+  const type = currentHaloType;
   const key = type === 'prodaja' ? 'prodaja' : 'renta';
   const delKey = key + '_deleted';
-
-  // Remove from local edits if it's a local record
-  if (localEdits[key]) {
-    localEdits[key] = localEdits[key].filter(r=>r.id!==editingId);
-  }
-  // Mark as deleted (to hide base record)
+  if (localEdits[key]) localEdits[key] = localEdits[key].filter(r=>r.id!==editingId);
   if (!localEdits[delKey]) localEdits[delKey] = [];
   if (!localEdits[delKey].includes(editingId)) localEdits[delKey].push(editingId);
-
   saveLocalEdits();
-  mergeData();
-  renderTable();
+  mergeHaloData();
+  renderHaloTable();
   updateBadges();
   closeModal();
 }
