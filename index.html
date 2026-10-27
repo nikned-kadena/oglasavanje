@@ -971,7 +971,7 @@ function renderHaloRow(r, isProd) {
     actionCell = '<span style="color:var(--muted);font-size:12px">Nije na Halo</span>';
   } else if (r.haloStatus === 'never_remove') {
     actionCell = '<span style="color:var(--green);font-size:12px">Stalni oglas</span>';
-    statusBadge = '<span class="status status-ok">✓ OK</span>';
+    statusBadge = '<span class="status status-ok">✓ Aktivan</span>';
   } else if (cp?.phase === 'Expired') {
     actionCell = '<span style="color:var(--red);font-weight:600;font-size:12px">Oglas istekao!</span>';
     statusBadge = '<span class="status status-urgent">⚠ Istekao</span>';
@@ -982,7 +982,7 @@ function renderHaloRow(r, isProd) {
     if (d <= 0) statusBadge = '<span class="status status-urgent">🔴 DANAS</span>';
     else if (d <= 2) statusBadge = '<span class="status status-urgent">🔴 Hitno</span>';
     else if (d <= 7) statusBadge = '<span class="status status-soon">🟡 Uskoro</span>';
-    else statusBadge = '<span class="status status-ok">✓ OK</span>';
+    else statusBadge = '<span class="status status-ok">✓ Aktivan</span>';
   } else if (!r.datum) {
     actionCell = '<span style="color:var(--muted);font-size:12px">Bez datuma</span>';
   }
@@ -1114,9 +1114,9 @@ function renderNkrRow(r, isRenta) {
     if (d <= 0) statusBadge = '<span class="status status-urgent">🔴 DANAS</span>';
     else if (d <= 2) statusBadge = '<span class="status status-urgent">🔴 Hitno</span>';
     else if (d <= 7) statusBadge = '<span class="status status-soon">🟡 Uskoro</span>';
-    else statusBadge = '<span class="status status-ok">✓ OK</span>';
+    else statusBadge = '<span class="status status-ok">✓ Aktivan</span>';
   } else if (cp && cp.phase !== 'Expired') {
-    statusBadge = '<span class="status status-ok">✓ OK</span>';
+    statusBadge = '<span class="status status-ok">✓ Aktivan</span>';
   }
 
   const fmtPhaseDate = (d) => d ? `<span style="font-size:12px">${d}</span>` : '<span style="color:var(--muted)">—</span>';
