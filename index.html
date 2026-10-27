@@ -907,7 +907,7 @@ function renderHaloTable() {
   const head = document.getElementById('haloTableHead');
   const body = document.getElementById('haloTableBody');
 
-  head.innerHTML = '<th>Vlasnik</th><th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Halo status</th><th></th>';
+  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Halo status</th><th></th>';
 
   const q = (document.getElementById('haloSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
@@ -936,7 +936,7 @@ function renderHaloTable() {
   });
 
   if (!rows.length) {
-    body.innerHTML = '<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>';
+    body.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>';
     updateHaloAlertBar(data);
     return;
   }
@@ -993,7 +993,6 @@ function renderHaloRow(r, isProd) {
   const editBtn = `<button class="btn btn-sm" onclick="openEdit('${r.id}')">✏️</button>`;
 
   return `<tr>
-    <td>${r.vlasnik||'—'}</td>
     <td><strong>${r.nekretnina||'—'}</strong></td>
     <td>${r.agent||'—'}</td>
     <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
@@ -1037,7 +1036,7 @@ function renderNkrTable() {
   const head = document.getElementById('nkrTableHead');
   const body = document.getElementById('nkrTableBody');
 
-  head.innerHTML = '<th>Vlasnik</th><th>Nekretnina</th><th>Agent</th><th>Cena</th><th>Sledeća akcija</th><th>Status</th><th>Faza</th>' + (isRenta ? '' : '<th>Napomena</th>') + '<th></th>';
+  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Cena</th><th>Sledeća akcija</th><th>Status</th><th>Faza</th>' + (isRenta ? '' : '<th>Napomena</th>') + '<th></th>';
 
   const q = (document.getElementById('nkrSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
@@ -1064,7 +1063,7 @@ function renderNkrTable() {
   });
 
   if (!rows.length) {
-    const colspan = isRenta ? 8 : 9;
+    const colspan = isRenta ? 7 : 8;
     body.innerHTML = `<tr><td colspan="${colspan}"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>`;
     return;
   }
@@ -1115,7 +1114,6 @@ function renderNkrRow(r, isRenta) {
   const vlasnik = r.vlasnik ? `<span style="font-size:12px">${r.vlasnik}</span>` : '<span style="color:var(--muted)">—</span>';
 
   return `<tr>
-    <td>${vlasnik}</td>
     <td><strong>${r.nekretnina||'—'}</strong></td>
     <td><span style="font-size:12px">${nkrAgentName(r.agent)}</span></td>
     <td style="white-space:nowrap">${cena}</td>
