@@ -362,6 +362,59 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 </div>
 
 <!-- ADD/EDIT MODAL (Halo) -->
+<!-- NKR Edit Modal -->
+<div class="overlay" id="nkrOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <span id="nkrModalTitle">Izmeni NKR oglas</span>
+      <button class="modal-close" onclick="closeNkrModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="nkrEditId">
+      <div class="info-box" style="margin-bottom:12px">
+        ℹ️ Izmene se čuvaju lokalno u tvom pregledaču.
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Nekretnina</label>
+        <input type="text" id="nkrFNekretnina" placeholder="Naziv / adresa">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Agent</label>
+          <input type="text" id="nkrFAgent" placeholder="Ime agenta">
+        </div>
+        <div class="form-group">
+          <label>Cena</label>
+          <input type="text" id="nkrFCena" placeholder="npr. € 2.000 / mesečno">
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:8px">
+        <div class="form-group">
+          <label>Premium od</label>
+          <input type="text" id="nkrFPremium" placeholder="DD.MM.">
+        </div>
+        <div class="form-group">
+          <label>Standard od</label>
+          <input type="text" id="nkrFStandard" placeholder="DD.MM.">
+        </div>
+        <div class="form-group">
+          <label>Lite od</label>
+          <input type="text" id="nkrFLite" placeholder="DD.MM.">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:8px">
+        <label>Napomena</label>
+        <input type="text" id="nkrFNapomena" placeholder="Opcionalno">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeNkrModal()">Otkaži</button>
+      <button class="btn btn-danger btn-sm" id="nkrDeleteBtn" onclick="deleteNkrAd()" style="display:none;margin-right:auto">🗑 Obriši</button>
+      <button class="btn btn-gold" onclick="saveNkrAd()">Sačuvaj lokalno</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="modal-head">
@@ -431,6 +484,32 @@ let localEdits = {};
 let nkrRentaBase = [], nkrResaleBase = [];
 let nkrRentaData = [], nkrResaleData = [];
 
+// Agent mapping: NKR kratka → puna imena
+const NKR_AGENT_MAP = {
+  'ANĐELA': 'Anđela Vučić',
+  'ANDJELA': 'Anđela Vučić',
+  'MARIJA': 'Marija Kostadinović',
+  'MILICA': 'Milica',
+  'MILICA ŠKORIĆ': 'Milica Škorić',
+  'MILICA RADOSAVLJEVIĆ': 'Milica Radosavljević',
+  'ANA RALEVSKI': 'Ana Ralevski',
+  'SLAĐANA': 'Slađana Vukmirović',
+  'JOVANA ANGELOVSKI': 'Jovana Angelovski',
+  'JOVANA': 'Jovana Angelovski',
+  'SANJA STANOJEVIĆ': 'Sanja Stanojević',
+  'SANJA': 'Sanja Stanojević',
+  'NINA': 'Nina Pena',
+  'TIJANA': 'Tijana Janković',
+  'TIJANA JANKOVIĆ': 'Tijana Janković',
+};
+function nkrAgentName(raw) {
+  if (!raw) return '—';
+  const key = raw.trim().toUpperCase().replace('Đ','Đ').replace('Š','Š').replace('Ć','Ć').replace('Č','Č').replace('Ž','Ž');
+  return NKR_AGENT_MAP[key] || raw;
+}
+
+let nkrEditingId = null;
+
 let rules = {
   premDays:15, premRep:2, stdDaysProd:30,
   topDays:15, topRep:2, stdDaysRenta:30,
@@ -476,6 +555,95 @@ function mergeHaloData() {
   rentaData = [...rBase, ...rEdits].filter(r => !rDeleted.has(r.id));
 }
 
+function mergeNkrData() {
+  const nrEdits = (localEdits.nkr_renta || []);
+  const nsEdits = (localEdits.nkr_resale || []);
+  const nrDeleted = new Set((localEdits.nkr_renta_deleted || []));
+  const nsDeleted = new Set((localEdits.nkr_resale_deleted || []));
+  const nrLocalIds = new Set(nrEdits.map(r=>r.id));
+  const nsLocalIds = new Set(nsEdits.map(r=>r.id));
+  const nrBase = nkrRentaBase.filter(r => !nrLocalIds.has(r.id) && !nrDeleted.has(r.id));
+  const nsBase = nkrResaleBase.filter(r => !nsLocalIds.has(r.id) && !nsDeleted.has(r.id));
+  nkrRentaData = [...nrBase, ...nrEdits].filter(r => !nrDeleted.has(r.id));
+  nkrResaleData = [...nsBase, ...nsEdits].filter(r => !nsDeleted.has(r.id));
+}
+
+// NKR edit modal
+function openNkrEdit(id) {
+  const isRenta = currentNkrType === 'renta';
+  const data = isRenta ? nkrRentaData : nkrResaleData;
+  const r = data.find(x=>x.id===id);
+  if (!r) return;
+  nkrEditingId = id;
+  document.getElementById('nkrModalTitle').textContent = 'Izmeni NKR oglas';
+  document.getElementById('nkrEditId').value = id;
+  document.getElementById('nkrFNekretnina').value = r.nekretnina||'';
+  document.getElementById('nkrFAgent').value = nkrAgentName(r.agent);
+  document.getElementById('nkrFCena').value = r.cena||'';
+  document.getElementById('nkrFPremium').value = r.premium||'';
+  document.getElementById('nkrFStandard').value = r.standard||'';
+  document.getElementById('nkrFLite').value = r.lite||'';
+  document.getElementById('nkrFNapomena').value = r.napomena||'';
+  document.getElementById('nkrDeleteBtn').style.display = 'inline-block';
+  document.getElementById('nkrOverlay').classList.add('open');
+}
+
+function closeNkrModal() {
+  document.getElementById('nkrOverlay').classList.remove('open');
+  nkrEditingId = null;
+}
+
+function saveNkrAd() {
+  const isRenta = currentNkrType === 'renta';
+  const key = isRenta ? 'nkr_renta' : 'nkr_resale';
+  const rec = {
+    id: nkrEditingId,
+    nekretnina: document.getElementById('nkrFNekretnina').value.trim(),
+    agent: document.getElementById('nkrFAgent').value.trim(),
+    cena: document.getElementById('nkrFCena').value.trim(),
+    premium: document.getElementById('nkrFPremium').value.trim() || null,
+    standard: document.getElementById('nkrFStandard').value.trim() || null,
+    lite: document.getElementById('nkrFLite').value.trim() || null,
+    napomena: document.getElementById('nkrFNapomena').value.trim() || null,
+    _local: true
+  };
+  // preserve vlasnik from original
+  const origData = isRenta ? nkrRentaData : nkrResaleData;
+  const orig = origData.find(x=>x.id===nkrEditingId);
+  if (orig) rec.vlasnik = orig.vlasnik;
+
+  if (!localEdits[key]) localEdits[key] = [];
+  const idx = localEdits[key].findIndex(r=>r.id===nkrEditingId);
+  if (idx >= 0) localEdits[key][idx] = rec;
+  else localEdits[key].push(rec);
+
+  saveLocalEdits();
+  mergeNkrData();
+  renderNkrTable();
+  updateBadges();
+  closeNkrModal();
+}
+
+function deleteNkrAd() {
+  if (!nkrEditingId) return;
+  if (!confirm('Obriši ovaj NKR oglas lokalno?')) return;
+  const isRenta = currentNkrType === 'renta';
+  const key = isRenta ? 'nkr_renta' : 'nkr_resale';
+  const delKey = key + '_deleted';
+  if (localEdits[key]) localEdits[key] = localEdits[key].filter(r=>r.id!==nkrEditingId);
+  if (!localEdits[delKey]) localEdits[delKey] = [];
+  if (!localEdits[delKey].includes(nkrEditingId)) localEdits[delKey].push(nkrEditingId);
+  saveLocalEdits();
+  mergeNkrData();
+  renderNkrTable();
+  updateBadges();
+  closeNkrModal();
+}
+
+document.getElementById('nkrOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeNkrModal();
+});
+
 // ============================================================
 // INIT
 // ============================================================
@@ -493,9 +661,6 @@ async function init() {
   rentaBase = RENTA_HALO_DATA;
   nkrRentaBase = NKR_RENTA_DATA;
   nkrResaleBase = NKR_RESALE_DATA;
-  nkrRentaData = [...nkrRentaBase];
-  nkrResaleData = [...nkrResaleBase];
-
   const lu = document.getElementById('lastUpdated');
   if (lu) {
     try {
@@ -505,6 +670,7 @@ async function init() {
   }
 
   mergeHaloData();
+  mergeNkrData();
   renderHaloTable();
   updateBadges();
 }
@@ -872,9 +1038,9 @@ function renderNkrTable() {
   const body = document.getElementById('nkrTableBody');
 
   if (isRenta) {
-    head.innerHTML = '<th>Vlasnik</th><th>Nekretnina</th><th>Cena</th><th>Agent</th><th>Premium</th><th>Standard</th><th>Lite</th><th>Faza</th><th>Status</th>';
+    head.innerHTML = '<th>Vlasnik</th><th>Nekretnina</th><th>Cena</th><th>Agent</th><th>Premium</th><th>Standard</th><th>Lite</th><th>Faza</th><th>Status</th><th></th>';
   } else {
-    head.innerHTML = '<th>Nekretnina</th><th>Cena</th><th>Agent</th><th>Premium</th><th>Standard</th><th>Lite</th><th>Faza</th><th>Status</th><th>Napomena</th>';
+    head.innerHTML = '<th>Nekretnina</th><th>Cena</th><th>Agent</th><th>Premium</th><th>Standard</th><th>Lite</th><th>Faza</th><th>Status</th><th>Napomena</th><th></th>';
   }
 
   const q = (document.getElementById('nkrSearch')?.value||'').toLowerCase();
@@ -940,30 +1106,34 @@ function renderNkrRow(r, isRenta) {
   const fmtPhaseDate = (d) => d ? `<span style="font-size:12px">${d}</span>` : '<span style="color:var(--muted)">—</span>';
   const napomena = r.napomena ? `<span class="napomena-chip">${r.napomena}</span>` : '—';
   const cena = r.cena ? `<span style="font-size:12px;color:var(--navy)">${r.cena}</span>` : '—';
+  const agentDisplay = `<span style="font-size:12px">${nkrAgentName(r.agent)}</span>`;
+  const editBtn = `<button class="btn btn-sm" style="padding:2px 7px;font-size:11px" onclick="openNkrEdit('${r.id}')">✏️</button>`;
 
   if (isRenta) {
     return `<tr>
       <td style="font-size:12px">${r.vlasnik||'—'}</td>
       <td><strong>${r.nekretnina||'—'}</strong></td>
       <td style="white-space:nowrap">${cena}</td>
-      <td style="font-size:12px">${r.agent||'—'}</td>
+      <td>${agentDisplay}</td>
       <td>${fmtPhaseDate(r.premium)}</td>
       <td>${fmtPhaseDate(r.standard)}</td>
       <td>${fmtPhaseDate(r.lite)}</td>
       <td>${phaseBadge}</td>
       <td>${statusBadge}</td>
+      <td>${editBtn}</td>
     </tr>`;
   } else {
     return `<tr>
       <td><strong>${r.nekretnina||'—'}</strong></td>
       <td style="white-space:nowrap">${cena}</td>
-      <td style="font-size:12px">${r.agent||'—'}</td>
+      <td>${agentDisplay}</td>
       <td>${fmtPhaseDate(r.premium)}</td>
       <td>${fmtPhaseDate(r.standard)}</td>
       <td>${fmtPhaseDate(r.lite)}</td>
       <td>${phaseBadge}</td>
       <td>${statusBadge}</td>
       <td>${napomena}</td>
+      <td>${editBtn}</td>
     </tr>`;
   }
 }
