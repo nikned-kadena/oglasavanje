@@ -240,6 +240,7 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
       <button class="btn btn-sm active" id="nkrFilterAll" onclick="setNkrFilter('sve')">Sve</button>
       <button class="btn btn-sm" id="nkrFilterUrgent" onclick="setNkrFilter('hitno')">🔴 Hitno</button>
       <button class="btn btn-sm" id="nkrFilterSoon" onclick="setNkrFilter('uskoro')">🟡 Uskoro</button>
+      <button class="btn btn-gold btn-sm" onclick="openNkrAdd()" style="margin-left:8px">+ Dodaj oglas</button>
     </div>
   </div>
 
@@ -585,6 +586,21 @@ function openNkrEdit(id) {
   document.getElementById('nkrFLite').value = r.lite||'';
   document.getElementById('nkrFNapomena').value = r.napomena||'';
   document.getElementById('nkrDeleteBtn').style.display = 'inline-block';
+  document.getElementById('nkrOverlay').classList.add('open');
+}
+
+function openNkrAdd() {
+  nkrEditingId = 'local_' + Date.now();
+  document.getElementById('nkrModalTitle').textContent = 'Dodaj NKR oglas';
+  document.getElementById('nkrEditId').value = nkrEditingId;
+  document.getElementById('nkrFNekretnina').value = '';
+  document.getElementById('nkrFAgent').value = '';
+  document.getElementById('nkrFCena').value = '';
+  document.getElementById('nkrFPremium').value = '';
+  document.getElementById('nkrFStandard').value = '';
+  document.getElementById('nkrFLite').value = '';
+  document.getElementById('nkrFNapomena').value = '';
+  document.getElementById('nkrDeleteBtn').style.display = 'none';
   document.getElementById('nkrOverlay').classList.add('open');
 }
 
