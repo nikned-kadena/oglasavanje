@@ -82,12 +82,12 @@ tr:hover td{background:#f8fafc}
 
 /* PHASE BADGES */
 .phase{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.phase-premium,.phase-top{background:#fff3cd;color:#856404}
+.phase-premium{background:#fff3cd;color:#856404}
+.phase-top{background:#ffe0b2;color:#e65100}
 .phase-standard{background:#d1ecf1;color:#0c5460}
 .phase-lite{background:#e8eaf6;color:#3949ab}
 .phase-expired{background:#f8d7da;color:#842029}
-.phase-kir{background:#e2e3e5;color:#383d41}
-.phase-hidden{background:#e2e3e5;color:#383d41}
+.phase-none{background:#f0f0f0;color:#888}
 
 /* STATUS PILLS */
 .status{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
@@ -95,6 +95,13 @@ tr:hover td{background:#f8fafc}
 .status-soon{background:var(--orange-light);color:var(--orange)}
 .status-ok{background:var(--green-light);color:var(--green)}
 .status-na{background:#f0f0f0;color:#888}
+
+/* PORTAL PILLS */
+.portal{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.portal-active{background:var(--green-light);color:var(--green)}
+.portal-always{background:#e3f2fd;color:#1565c0}
+.portal-kir{background:#f0f0f0;color:#888}
+.portal-hidden{background:#f0f0f0;color:#888}
 
 /* STATS GRID */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
@@ -1148,7 +1155,7 @@ function renderHaloTable() {
   const head = document.getElementById('haloTableHead');
   const body = document.getElementById('haloTableBody');
 
-  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Halo status</th><th></th>';
+  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Portal</th><th></th>';
 
   const q = (document.getElementById('haloSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
@@ -1177,7 +1184,7 @@ function renderHaloTable() {
   });
 
   if (!rows.length) {
-    body.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>';
+    body.innerHTML = '<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>';
     updateHaloAlertBar(data);
     return;
   }
@@ -1192,11 +1199,13 @@ function renderHaloRow(r, isProd) {
   const cp = currentPhase(sch);
   const na = nextAction(sch);
 
-  let phaseBadge = '—';
-  if (r.haloStatus === 'kir') phaseBadge = '<span class="phase phase-kir">KIR/NK</span>';
-  else if (r.haloStatus === 'hidden') phaseBadge = '<span class="phase phase-hidden">Sakriven</span>';
-  else if (r.haloStatus === 'never_remove') phaseBadge = '<span class="phase phase-standard">Uvek aktivan</span>';
-  else if (cp) {
+  // Faza — logička faza oglasa (samo ako je oglas aktivan na portalu)
+  let phaseBadge = '<span class="phase phase-none">—</span>';
+  if (r.haloStatus === 'kir' || r.haloStatus === 'hidden') {
+    phaseBadge = '<span class="phase phase-none">—</span>';
+  } else if (r.haloStatus === 'never_remove') {
+    phaseBadge = '<span class="phase phase-standard">Standard</span>';
+  } else if (cp) {
     if (cp.phase==='Expired') phaseBadge = '<span class="phase phase-expired">Istekao</span>';
     else if (cp.phase==='Premium') phaseBadge = '<span class="phase phase-premium">Premium</span>';
     else if (cp.phase==='Top') phaseBadge = '<span class="phase phase-top">Top</span>';
@@ -1224,13 +1233,14 @@ function renderHaloRow(r, isProd) {
     actionCell = '<span style="color:var(--muted);font-size:12px">Bez datuma</span>';
   }
 
-  const haloMap = {
-    active:'<span style="color:var(--green);font-size:12px">✓ Aktivan</span>',
-    kir:'<span style="color:var(--muted);font-size:12px">KIR/NK</span>',
-    hidden:'<span style="color:var(--muted);font-size:12px">Sakriven</span>',
-    never_remove:'<span style="color:var(--blue);font-size:12px">Uvek aktivan</span>'
+  // Portal — config vrednost (KIR/NK, Sakriven, Uvek aktivan, Aktivan)
+  const portalMap = {
+    active:       '<span class="portal portal-active">✓ Aktivan</span>',
+    kir:          '<span class="portal portal-kir">KIR/NK</span>',
+    hidden:       '<span class="portal portal-hidden">Sakriven</span>',
+    never_remove: '<span class="portal portal-always">Uvek aktivan</span>'
   };
-  const haloChip = haloMap[r.haloStatus]||'—';
+  const haloChip = portalMap[r.haloStatus] || '—';
   const editBtn = `<button class="btn btn-sm" onclick="openEdit('${r.id}')">✏️</button>`;
 
   const haloCena = r.cena ? `<span style="font-size:12px;color:var(--navy)">${r.cena}</span>` : '<span style="color:var(--muted)">—</span>';
@@ -1284,7 +1294,7 @@ function renderNkrTable() {
   const head = document.getElementById('nkrTableHead');
   const body = document.getElementById('nkrTableBody');
 
-  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Cena</th><th>Sledeća akcija</th><th>Status</th><th>Faza</th>' + (isRenta ? '' : '<th>Napomena</th>') + '<th></th>';
+  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th>' + (isRenta ? '' : '<th>Napomena</th>') + '<th></th>';
 
   const q = (document.getElementById('nkrSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
@@ -1324,14 +1334,14 @@ function renderNkrRow(r, isRenta) {
   const nt = nkrNextTransition(r);
 
   // Phase badge
-  let phaseBadge = '—';
+  let phaseBadge = '<span class="phase phase-none">—</span>';
   if (cp) {
     if (cp.phase === 'Expired') phaseBadge = '<span class="phase phase-expired">Istekao</span>';
     else if (cp.phase === 'Premium') phaseBadge = '<span class="phase phase-premium">Premium</span>';
     else if (cp.phase === 'Standard') phaseBadge = '<span class="phase phase-standard">Standard</span>';
     else if (cp.phase === 'Lite') phaseBadge = '<span class="phase phase-lite">Lite</span>';
   } else if (!r.premium && !r.standard && !r.lite) {
-    phaseBadge = '<span style="color:var(--muted);font-size:12px">Bez datuma</span>';
+    phaseBadge = '<span class="phase phase-none">—</span>';
   }
 
   // Action cell — same pattern as Halo "Sledeća akcija"
@@ -1370,9 +1380,9 @@ function renderNkrRow(r, isRenta) {
     <td><span style="font-size:12px">${nkrAgentName(r.agent)}</span></td>
     <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
     <td style="white-space:nowrap">${cena}</td>
+    <td>${phaseBadge}</td>
     <td>${actionCell}</td>
     <td>${statusBadge}</td>
-    <td>${phaseBadge}</td>
     ${isRenta ? '' : `<td>${napomena}</td>`}
     <td>${editBtn}</td>
   </tr>`;
