@@ -1201,6 +1201,15 @@ function renderHaloTable() {
 
 function renderHaloRow(r, isProd) {
   const type = isProd ? 'prodaja' : 'renta';
+  // Lookup cena iz NKR_RESALE_DATA po imenu (za prodaju) ili NKR_RENTA_DATA (za rentu)
+  if (!r.cena) {
+    const resaleMatch = NKR_RESALE_DATA.find(x => x.nekretnina === r.nekretnina);
+    if (resaleMatch && resaleMatch.cena) r = {...r, cena: resaleMatch.cena};
+    else if (!isProd) {
+      const rentaMatch = NKR_RENTA_DATA.find(x => x.nekretnina === r.nekretnina);
+      if (rentaMatch && rentaMatch.cena) r = {...r, cena: rentaMatch.cena};
+    }
+  }
   const sch = computeHaloSchedule(r.datum, type);
   const cp = currentPhase(sch);
   const na = nextAction(sch);
