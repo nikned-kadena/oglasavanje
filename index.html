@@ -1220,8 +1220,12 @@ function renderHaloRow(r, isProd) {
 
   const haloCena = r.cena ? `<span style="font-size:12px;color:var(--navy)">${r.cena}</span>` : '<span style="color:var(--muted)">—</span>';
 
+  const haloNaziv = r.url
+    ? `<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--navy);text-decoration:none;font-weight:700" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${r.nekretnina||'—'}</a>`
+    : `<strong>${r.nekretnina||'—'}</strong>`;
+
   return `<tr>
-    <td><strong>${r.nekretnina||'—'}</strong></td>
+    <td>${haloNaziv}</td>
     <td>${r.agent||'—'}</td>
     <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
     <td style="white-space:nowrap">${haloCena}</td>
@@ -1342,8 +1346,12 @@ function renderNkrRow(r, isRenta) {
   const editBtn = `<button class="btn btn-sm" onclick="openNkrEdit('${r.id}')">✏️</button>`;
   const vlasnik = r.vlasnik ? `<span style="font-size:12px">${r.vlasnik}</span>` : '<span style="color:var(--muted)">—</span>';
 
+  const nkrNaziv = r.url
+    ? `<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--navy);text-decoration:none;font-weight:700" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${r.nekretnina||'—'}</a>`
+    : `<strong>${r.nekretnina||'—'}</strong>`;
+
   return `<tr>
-    <td><strong>${r.nekretnina||'—'}</strong></td>
+    <td>${nkrNaziv}</td>
     <td><span style="font-size:12px">${nkrAgentName(r.agent)}</span></td>
     <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
     <td style="white-space:nowrap">${cena}</td>
