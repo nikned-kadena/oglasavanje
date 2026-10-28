@@ -390,15 +390,15 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 
       <!-- ADD mode: smart package selector -->
       <div id="nkrAddSection" style="display:none">
-        <div class="form-group" style="margin-bottom:10px">
-          <label>URL sa kadena sajta <span style="font-size:11px;color:var(--muted)">(opciono – auto-popuni)</span></label>
-          <div style="display:flex;gap:8px">
-            <input type="text" id="nkrFUrl" placeholder="https://kadenasothebysrealty.com/sr/property/..." style="flex:1">
-            <button class="btn btn-sm" onclick="nkrFetchUrl()" style="white-space:nowrap;padding:0 12px">↙ Uvezi</button>
+        <div id="nkrBrziUvozBox" style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;margin-bottom:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.5px;margin-bottom:6px">⚡ BRZI UVOZ</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="nkrFUrl" placeholder="https://kadenasothebysrealty.com/sr/property/..." style="flex:1;font-size:12px">
+            <button class="btn btn-sm" onclick="nkrFetchUrl()" style="white-space:nowrap;font-size:12px;padding:0 12px">Uvezi</button>
           </div>
-          <div id="nkrUrlStatus" style="font-size:11px;color:var(--muted);margin-top:4px;min-height:16px"></div>
+          <div id="nkrUrlStatus" style="font-size:11px;margin-top:6px;color:var(--muted);display:none"></div>
         </div>
-        <div class="form-group" style="margin-bottom:10px">
+        <div class="form-group" style="margin-bottom:12px">
           <label>Nekretnina</label>
           <input type="text" id="nkrFNekretninaAdd" placeholder="Naziv / adresa">
         </div>
@@ -411,6 +411,10 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
             <label>Cena</label>
             <input type="text" id="nkrFCenaAdd" placeholder="npr. € 2.000 / mesečno">
           </div>
+        </div>
+        <div class="form-group" style="margin-top:10px">
+          <label>Datum postavljanja</label>
+          <input type="date" id="nkrFStartDate" style="font-size:13px">
         </div>
         <div class="form-group" style="margin-top:12px">
           <label>Paket oglašavanja</label>
@@ -432,19 +436,11 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
             </button>
           </div>
         </div>
-        <div id="nkrAddDateRow" style="margin-top:10px;display:none">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Datum početka paketa</label>
-              <input type="date" id="nkrFStartDate" style="font-size:13px">
-            </div>
-            <div class="form-group">
-              <label>Napomena</label>
-              <input type="text" id="nkrFNapomenaAdd" placeholder="Opcionalno">
-            </div>
-          </div>
-          <div id="nkrAddPreview" style="margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border);font-size:12px;color:var(--muted);display:none"></div>
+        <div class="form-group" style="margin-top:10px">
+          <label>Napomena</label>
+          <input type="text" id="nkrFNapomenaAdd" placeholder="Opcionalno">
         </div>
+        <div id="nkrAddPreview" style="margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border);font-size:12px;color:var(--muted);display:none"></div>
       </div>
 
       <!-- EDIT mode: manual date fields -->
@@ -667,7 +663,6 @@ function nkrSetMode(isAdd) {
 function selectNkrPkg(pkg) {
   nkrSelectedPackage = pkg;
   document.querySelectorAll('.pkg-btn').forEach(b => b.classList.toggle('selected', b.dataset.pkg === pkg));
-  document.getElementById('nkrAddDateRow').style.display = 'block';
   nkrUpdatePreview();
 }
 
@@ -729,6 +724,7 @@ async function nkrFetchUrl() {
   const statusEl = document.getElementById('nkrUrlStatus');
   const url = urlEl.value.trim();
   if (!url) return;
+  statusEl.style.display = 'block';
   statusEl.textContent = 'Učitavam...';
   try {
     // Extract slug from URL: /sr/property/{slug}/
@@ -797,7 +793,6 @@ function openNkrAdd() {
   document.getElementById('nkrFNapomenaAdd').value = '';
   document.getElementById('nkrFStartDate').value = nkrTodayStr();
   document.querySelectorAll('.pkg-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('nkrAddDateRow').style.display = 'none';
   document.getElementById('nkrAddPreview').style.display = 'none';
   // Update package duration labels from rules
   document.getElementById('pkgDurPremium').textContent = (rules.nkrPremDays||30) + ' + ' + (rules.nkrStdDays||30) + ' + ' + (rules.nkrLiteDays||30) + ' dana';
