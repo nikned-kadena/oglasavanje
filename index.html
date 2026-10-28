@@ -1190,7 +1190,7 @@ function renderStats() {
 
 function renderBarChart(containerId, counts, total) {
   const colors = { Premium:'#856404', Top:'#856404', Standard:'#0c5460', Lite:'#3949ab', Istekao:'#842029', Expired:'#842029', 'Uvek aktivan':'#0c6634', 'Bez datuma':'#888' };
-  const order = ['Istekao','Premium','Top','Standard','Lite','Uvek aktivan','Bez datuma'];
+  const order = ['Istekao','Lite','Standard','Top','Premium','Uvek aktivan','Bez datuma'];
   const container = document.getElementById(containerId);
   if (!counts || Object.keys(counts).length === 0) {
     container.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Nema podataka</div>';
