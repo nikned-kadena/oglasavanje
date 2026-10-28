@@ -1161,7 +1161,7 @@ function renderHaloTable() {
   const head = document.getElementById('haloTableHead');
   const body = document.getElementById('haloTableBody');
 
-  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Portal</th><th></th>';
+  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th style="text-align:right">Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Portal</th><th></th>';
 
   const q = (document.getElementById('haloSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
@@ -1259,7 +1259,7 @@ function renderHaloRow(r, isProd) {
     <td>${haloNaziv}</td>
     <td>${r.agent||'—'}</td>
     <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
-    <td style="white-space:nowrap">${haloCena}</td>
+    <td style="white-space:nowrap;text-align:right">${haloCena}</td>
     <td>${phaseBadge}</td>
     <td>${actionCell}</td>
     <td>${statusBadge}</td>
@@ -1300,7 +1300,7 @@ function renderNkrTable() {
   const head = document.getElementById('nkrTableHead');
   const body = document.getElementById('nkrTableBody');
 
-  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th>' + (isRenta ? '' : '<th>Napomena</th>') + '<th></th>';
+  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th style="text-align:right">Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th>' + (isRenta ? '' : '<th>Napomena</th>') + '<th></th>';
 
   const q = (document.getElementById('nkrSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
@@ -1385,7 +1385,7 @@ function renderNkrRow(r, isRenta) {
     <td>${nkrNaziv}</td>
     <td><span style="font-size:12px">${nkrAgentName(r.agent)}</span></td>
     <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
-    <td style="white-space:nowrap">${cena}</td>
+    <td style="white-space:nowrap;text-align:right">${cena}</td>
     <td>${phaseBadge}</td>
     <td>${actionCell}</td>
     <td>${statusBadge}</td>
