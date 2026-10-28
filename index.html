@@ -825,11 +825,15 @@ function saveNkrAd() {
     if (!startIso) { alert('Unesi datum početka!'); return; }
     const dates = nkrComputeDates(nkrSelectedPackage, startIso);
     const urlEl = document.getElementById('nkrFUrl');
+    // datum postavljanja = datum pocetka paketa, formatiran kao DD.MM.YYYY
+    const startD = new Date(startIso + 'T00:00:00');
+    const datumPost = String(startD.getDate()).padStart(2,'0') + '.' + String(startD.getMonth()+1).padStart(2,'0') + '.' + startD.getFullYear() + '.';
     rec = {
       id: nkrEditingId,
       nekretnina: document.getElementById('nkrFNekretninaAdd').value.trim(),
       agent: document.getElementById('nkrFAgentAdd').value.trim(),
       cena: document.getElementById('nkrFCenaAdd').value.trim(),
+      datum: datumPost,
       premium: dates.premium,
       standard: dates.standard,
       lite: dates.lite,
