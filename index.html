@@ -1494,7 +1494,9 @@ function openAdd() {
   document.getElementById('fNekretnina').value = '';
   document.getElementById('fAgent').value = '';
   document.getElementById('fVlasnik').value = '';
-  document.getElementById('fDatum').value = '';
+  // default: danasnji datum
+  const _t = new Date();
+  document.getElementById('fDatum').value = String(_t.getDate()).padStart(2,'0') + '.' + String(_t.getMonth()+1).padStart(2,'0') + '.' + _t.getFullYear() + '.';
   document.getElementById('deleteBtn').style.display = 'none';
   document.getElementById('editInfoBox').style.display = 'block';
   document.getElementById('brziUvozBox').style.display = 'block';
