@@ -1249,7 +1249,7 @@ function renderHaloRow(r, isProd) {
   const haloChip = portalMap[r.haloStatus] || '—';
   const editBtn = `<button class="btn btn-sm" onclick="openEdit('${r.id}')">✏️</button>`;
 
-  const haloCena = r.cena ? `<span style="font-size:12px;color:var(--navy)">${formatCena(r.cena)}</span>` : '<span style="color:var(--muted)">—</span>';
+  const haloCena = r.cena ? `<span style="font-size:12px;color:var(--navy);display:block;text-align:right">${formatCena(r.cena)}</span>` : '<span style="color:var(--muted);display:block;text-align:right">—</span>';
 
   const haloNaziv = r.url
     ? `<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--navy);text-decoration:none;font-weight:700" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${r.nekretnina||'—'}</a>`
@@ -1373,7 +1373,7 @@ function renderNkrRow(r, isRenta) {
   }
 
   const napomena = r.napomena ? `<span class="napomena-chip">${r.napomena}</span>` : '—';
-  const cena = r.cena ? `<span style="font-size:12px;color:var(--navy)">${formatCena(r.cena)}</span>` : '—';
+  const cena = r.cena ? `<span style="font-size:12px;color:var(--navy);display:block;text-align:right">${formatCena(r.cena)}</span>` : '<span style="display:block;text-align:right">—</span>';
   const editBtn = `<button class="btn btn-sm" onclick="openNkrEdit('${r.id}')">✏️</button>`;
   const vlasnik = r.vlasnik ? `<span style="font-size:12px">${r.vlasnik}</span>` : '<span style="color:var(--muted)">—</span>';
 
