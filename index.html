@@ -155,6 +155,20 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 .info-box{background:#eef2fa;border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--muted);margin-bottom:16px}
 .info-box strong{color:var(--navy)}
 
+/* PACKAGE PICKER */
+.pkg-btn{flex:1;min-width:90px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:2px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;transition:.15s;font-size:12px;color:var(--muted)}
+.pkg-btn:hover{border-color:var(--navy-light);color:var(--navy)}
+.pkg-btn.selected{border-color:var(--gold);background:#fffbf2;color:var(--navy)}
+.pkg-btn .pkg-icon{font-size:20px;line-height:1}
+.pkg-btn .pkg-name{font-weight:700;font-size:13px;color:inherit}
+.pkg-btn .pkg-dur{font-size:11px;color:var(--muted)}
+.pkg-btn.selected .pkg-dur{color:var(--gold)}
+#nkrAddPreview{display:flex;flex-direction:column;gap:4px}
+#nkrAddPreview .prev-row{display:flex;gap:6px;font-size:12px}
+#nkrAddPreview .prev-label{color:var(--muted);min-width:80px}
+#nkrAddPreview .prev-val{color:var(--navy);font-weight:600}
+#nkrAddPreview .prev-null{color:var(--border);font-style:italic}
+
 /* RESPONSIVE */
 @media(max-width:800px){
   .header{padding:0 12px;height:52px}
@@ -214,7 +228,7 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
     <table>
       <thead><tr id="haloTableHead"></tr></thead>
       <tbody id="haloTableBody">
-        <tr><td colspan="8"><div class="loading"><div class="spinner"></div>Učitavanje...</div></td></tr>
+        <tr><td colspan="9"><div class="loading"><div class="spinner"></div>Učitavanje...</div></td></tr>
       </tbody>
     </table>
   </div>
@@ -372,40 +386,104 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
     </div>
     <div class="modal-body">
       <input type="hidden" id="nkrEditId">
-      <div class="info-box" style="margin-bottom:12px">
-        ℹ️ Izmene se čuvaju lokalno u tvom pregledaču.
+      <input type="hidden" id="nkrIsAdd" value="0">
+
+      <!-- ADD mode: smart package selector -->
+      <div id="nkrAddSection" style="display:none">
+        <div class="form-group" style="margin-bottom:10px">
+          <label>URL sa kadena sajta <span style="font-size:11px;color:var(--muted)">(opciono – auto-popuni)</span></label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="nkrFUrl" placeholder="https://kadenasothebysrealty.com/sr/property/..." style="flex:1">
+            <button class="btn btn-sm" onclick="nkrFetchUrl()" style="white-space:nowrap;padding:0 12px">↙ Uvezi</button>
+          </div>
+          <div id="nkrUrlStatus" style="font-size:11px;color:var(--muted);margin-top:4px;min-height:16px"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Nekretnina</label>
+          <input type="text" id="nkrFNekretninaAdd" placeholder="Naziv / adresa">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Agent</label>
+            <input type="text" id="nkrFAgentAdd" placeholder="Ime agenta">
+          </div>
+          <div class="form-group">
+            <label>Cena</label>
+            <input type="text" id="nkrFCenaAdd" placeholder="npr. € 2.000 / mesečno">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label>Paket oglašavanja</label>
+          <div id="nkrPackagePicker" style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+            <button class="pkg-btn" data-pkg="premium" onclick="selectNkrPkg('premium')">
+              <span class="pkg-icon">⭐</span>
+              <span class="pkg-name">Premium</span>
+              <span class="pkg-dur" id="pkgDurPremium"></span>
+            </button>
+            <button class="pkg-btn" data-pkg="standard" onclick="selectNkrPkg('standard')">
+              <span class="pkg-icon">📋</span>
+              <span class="pkg-name">Standard</span>
+              <span class="pkg-dur" id="pkgDurStandard"></span>
+            </button>
+            <button class="pkg-btn" data-pkg="lite" onclick="selectNkrPkg('lite')">
+              <span class="pkg-icon">🔹</span>
+              <span class="pkg-name">Lite</span>
+              <span class="pkg-dur" id="pkgDurLite"></span>
+            </button>
+          </div>
+        </div>
+        <div id="nkrAddDateRow" style="margin-top:10px;display:none">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Datum početka paketa</label>
+              <input type="date" id="nkrFStartDate" style="font-size:13px">
+            </div>
+            <div class="form-group">
+              <label>Napomena</label>
+              <input type="text" id="nkrFNapomenaAdd" placeholder="Opcionalno">
+            </div>
+          </div>
+          <div id="nkrAddPreview" style="margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border);font-size:12px;color:var(--muted);display:none"></div>
+        </div>
       </div>
-      <div class="form-group" style="margin-bottom:12px">
-        <label>Nekretnina</label>
-        <input type="text" id="nkrFNekretnina" placeholder="Naziv / adresa">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Agent</label>
-          <input type="text" id="nkrFAgent" placeholder="Ime agenta">
+
+      <!-- EDIT mode: manual date fields -->
+      <div id="nkrEditSection">
+        <div class="info-box" style="margin-bottom:12px">
+          ℹ️ Izmene se čuvaju lokalno u tvom pregledaču.
         </div>
-        <div class="form-group">
-          <label>Cena</label>
-          <input type="text" id="nkrFCena" placeholder="npr. € 2.000 / mesečno">
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Nekretnina</label>
+          <input type="text" id="nkrFNekretnina" placeholder="Naziv / adresa">
         </div>
-      </div>
-      <div class="form-row" style="margin-top:8px">
-        <div class="form-group">
-          <label>Premium od</label>
-          <input type="text" id="nkrFPremium" placeholder="DD.MM.">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Agent</label>
+            <input type="text" id="nkrFAgent" placeholder="Ime agenta">
+          </div>
+          <div class="form-group">
+            <label>Cena</label>
+            <input type="text" id="nkrFCena" placeholder="npr. € 2.000 / mesečno">
+          </div>
         </div>
-        <div class="form-group">
-          <label>Standard od</label>
-          <input type="text" id="nkrFStandard" placeholder="DD.MM.">
+        <div class="form-row" style="margin-top:8px">
+          <div class="form-group">
+            <label>Premium od</label>
+            <input type="text" id="nkrFPremium" placeholder="DD.MM.">
+          </div>
+          <div class="form-group">
+            <label>Standard od</label>
+            <input type="text" id="nkrFStandard" placeholder="DD.MM.">
+          </div>
+          <div class="form-group">
+            <label>Lite od</label>
+            <input type="text" id="nkrFLite" placeholder="DD.MM.">
+          </div>
         </div>
-        <div class="form-group">
-          <label>Lite od</label>
-          <input type="text" id="nkrFLite" placeholder="DD.MM.">
+        <div class="form-group" style="margin-top:8px">
+          <label>Napomena</label>
+          <input type="text" id="nkrFNapomena" placeholder="Opcionalno">
         </div>
-      </div>
-      <div class="form-group" style="margin-top:8px">
-        <label>Napomena</label>
-        <input type="text" id="nkrFNapomena" placeholder="Opcionalno">
       </div>
     </div>
     <div class="modal-actions">
@@ -577,6 +655,111 @@ function mergeNkrData() {
   nkrResaleData = [...nsBase, ...nsEdits].filter(r => !nsDeleted.has(r.id));
 }
 
+// NKR add mode state
+let nkrSelectedPackage = null;
+
+function nkrSetMode(isAdd) {
+  document.getElementById('nkrIsAdd').value = isAdd ? '1' : '0';
+  document.getElementById('nkrAddSection').style.display = isAdd ? 'block' : 'none';
+  document.getElementById('nkrEditSection').style.display = isAdd ? 'none' : 'block';
+}
+
+function selectNkrPkg(pkg) {
+  nkrSelectedPackage = pkg;
+  document.querySelectorAll('.pkg-btn').forEach(b => b.classList.toggle('selected', b.dataset.pkg === pkg));
+  document.getElementById('nkrAddDateRow').style.display = 'block';
+  nkrUpdatePreview();
+}
+
+function nkrTodayStr() {
+  const d = new Date();
+  return d.toISOString().split('T')[0]; // YYYY-MM-DD for <input type=date>
+}
+
+function nkrAddDays(dateStr, days) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  return dd + '.' + mm + '.';
+}
+
+function nkrIso2ddmm(dateStr) {
+  if (!dateStr) return null;
+  const [y,m,d] = dateStr.split('-');
+  return d + '.' + m + '.';
+}
+
+function nkrComputeDates(pkg, startIso) {
+  const pDays = rules.nkrPremDays || 30;
+  const sDays = rules.nkrStdDays  || 30;
+  if (pkg === 'premium') {
+    return {
+      premium: nkrIso2ddmm(startIso),
+      standard: nkrAddDays(startIso, pDays),
+      lite: nkrAddDays(startIso, pDays + sDays)
+    };
+  } else if (pkg === 'standard') {
+    return {
+      premium: null,
+      standard: nkrIso2ddmm(startIso),
+      lite: nkrAddDays(startIso, sDays)
+    };
+  } else { // lite
+    return {
+      premium: null,
+      standard: null,
+      lite: nkrIso2ddmm(startIso)
+    };
+  }
+}
+
+function nkrUpdatePreview() {
+  const preview = document.getElementById('nkrAddPreview');
+  const startIso = document.getElementById('nkrFStartDate').value;
+  if (!nkrSelectedPackage || !startIso) { preview.style.display='none'; return; }
+  const d = nkrComputeDates(nkrSelectedPackage, startIso);
+  const row = (label, val) => `<div class="prev-row"><span class="prev-label">${label}</span><span class="${val ? 'prev-val' : 'prev-null'}">${val || '—'}</span></div>`;
+  preview.innerHTML = row('Premium od:', d.premium) + row('Standard od:', d.standard) + row('Lite od:', d.lite);
+  preview.style.display = 'flex';
+}
+
+async function nkrFetchUrl() {
+  const urlEl = document.getElementById('nkrFUrl');
+  const statusEl = document.getElementById('nkrUrlStatus');
+  const url = urlEl.value.trim();
+  if (!url) return;
+  statusEl.textContent = 'Učitavam...';
+  try {
+    // Extract slug from URL: /sr/property/{slug}/
+    const m = url.match(/\/property\/([^\/]+)/);
+    if (!m) { statusEl.textContent = '⚠️ Ne prepoznajem URL format'; return; }
+    const slug = m[1];
+    const apiUrl = `https://kadenasothebysrealty.com/wp-json/wp/v2/property?slug=${slug}&_fields=title,acf`;
+    const resp = await fetch(apiUrl);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.length) { statusEl.textContent = '⚠️ Listing nije pronađen'; return; }
+    const prop = data[0];
+    const naziv = prop.title?.rendered || '';
+    // Try to get agent name from ACF fields
+    let agent = '';
+    if (prop.acf) {
+      const acf = prop.acf;
+      if (acf.agent_name) agent = acf.agent_name;
+      else if (acf.agent && typeof acf.agent === 'object') agent = acf.agent.display_name || acf.agent.name || '';
+      else if (acf.listing_agent) agent = acf.listing_agent;
+    }
+    document.getElementById('nkrFNekretninaAdd').value = naziv.replace(/&#(\d+);/g, (_,c)=>String.fromCharCode(c)).replace(/&amp;/g,'&').replace(/&nbsp;/g,' ').trim();
+    if (agent) document.getElementById('nkrFAgentAdd').value = agent;
+    statusEl.textContent = '✓ Uvezeno';
+    // Store URL
+    urlEl.dataset.resolvedUrl = url;
+  } catch(e) {
+    statusEl.textContent = '⚠️ Greška: ' + e.message;
+  }
+}
+
 // NKR edit modal
 function openNkrEdit(id) {
   const isRenta = currentNkrType === 'renta';
@@ -584,6 +767,7 @@ function openNkrEdit(id) {
   const r = data.find(x=>x.id===id);
   if (!r) return;
   nkrEditingId = id;
+  nkrSetMode(false);
   document.getElementById('nkrModalTitle').textContent = 'Izmeni NKR oglas';
   document.getElementById('nkrEditId').value = id;
   document.getElementById('nkrFNekretnina').value = r.nekretnina||'';
@@ -599,17 +783,30 @@ function openNkrEdit(id) {
 
 function openNkrAdd() {
   nkrEditingId = 'local_' + Date.now();
+  nkrSelectedPackage = null;
+  nkrSetMode(true);
   document.getElementById('nkrModalTitle').textContent = 'Dodaj NKR oglas';
   document.getElementById('nkrEditId').value = nkrEditingId;
-  document.getElementById('nkrFNekretnina').value = '';
-  document.getElementById('nkrFAgent').value = '';
-  document.getElementById('nkrFCena').value = '';
-  document.getElementById('nkrFPremium').value = '';
-  document.getElementById('nkrFStandard').value = '';
-  document.getElementById('nkrFLite').value = '';
-  document.getElementById('nkrFNapomena').value = '';
+  // Clear add fields
+  document.getElementById('nkrFUrl').value = '';
+  document.getElementById('nkrFUrl').dataset.resolvedUrl = '';
+  document.getElementById('nkrUrlStatus').textContent = '';
+  document.getElementById('nkrFNekretninaAdd').value = '';
+  document.getElementById('nkrFAgentAdd').value = '';
+  document.getElementById('nkrFCenaAdd').value = '';
+  document.getElementById('nkrFNapomenaAdd').value = '';
+  document.getElementById('nkrFStartDate').value = nkrTodayStr();
+  document.querySelectorAll('.pkg-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('nkrAddDateRow').style.display = 'none';
+  document.getElementById('nkrAddPreview').style.display = 'none';
+  // Update package duration labels from rules
+  document.getElementById('pkgDurPremium').textContent = (rules.nkrPremDays||30) + ' + ' + (rules.nkrStdDays||30) + ' + ' + (rules.nkrLiteDays||30) + ' dana';
+  document.getElementById('pkgDurStandard').textContent = (rules.nkrStdDays||30) + ' + ' + (rules.nkrLiteDays||30) + ' dana';
+  document.getElementById('pkgDurLite').textContent = (rules.nkrLiteDays||30) + ' dana';
   document.getElementById('nkrDeleteBtn').style.display = 'none';
   document.getElementById('nkrOverlay').classList.add('open');
+  // Live preview on date change
+  document.getElementById('nkrFStartDate').oninput = nkrUpdatePreview;
 }
 
 function closeNkrModal() {
@@ -620,17 +817,39 @@ function closeNkrModal() {
 function saveNkrAd() {
   const isRenta = currentNkrType === 'renta';
   const key = isRenta ? 'nkr_renta' : 'nkr_resale';
-  const rec = {
-    id: nkrEditingId,
-    nekretnina: document.getElementById('nkrFNekretnina').value.trim(),
-    agent: document.getElementById('nkrFAgent').value.trim(),
-    cena: document.getElementById('nkrFCena').value.trim(),
-    premium: document.getElementById('nkrFPremium').value.trim() || null,
-    standard: document.getElementById('nkrFStandard').value.trim() || null,
-    lite: document.getElementById('nkrFLite').value.trim() || null,
-    napomena: document.getElementById('nkrFNapomena').value.trim() || null,
-    _local: true
-  };
+  const isAdd = document.getElementById('nkrIsAdd').value === '1';
+  let rec;
+  if (isAdd) {
+    if (!nkrSelectedPackage) { alert('Izaberi paket oglašavanja!'); return; }
+    const startIso = document.getElementById('nkrFStartDate').value;
+    if (!startIso) { alert('Unesi datum početka!'); return; }
+    const dates = nkrComputeDates(nkrSelectedPackage, startIso);
+    const urlEl = document.getElementById('nkrFUrl');
+    rec = {
+      id: nkrEditingId,
+      nekretnina: document.getElementById('nkrFNekretninaAdd').value.trim(),
+      agent: document.getElementById('nkrFAgentAdd').value.trim(),
+      cena: document.getElementById('nkrFCenaAdd').value.trim(),
+      premium: dates.premium,
+      standard: dates.standard,
+      lite: dates.lite,
+      napomena: document.getElementById('nkrFNapomenaAdd').value.trim() || null,
+      url: urlEl.dataset.resolvedUrl || null,
+      _local: true
+    };
+  } else {
+    rec = {
+      id: nkrEditingId,
+      nekretnina: document.getElementById('nkrFNekretnina').value.trim(),
+      agent: document.getElementById('nkrFAgent').value.trim(),
+      cena: document.getElementById('nkrFCena').value.trim(),
+      premium: document.getElementById('nkrFPremium').value.trim() || null,
+      standard: document.getElementById('nkrFStandard').value.trim() || null,
+      lite: document.getElementById('nkrFLite').value.trim() || null,
+      napomena: document.getElementById('nkrFNapomena').value.trim() || null,
+      _local: true
+    };
+  }
   // preserve vlasnik from original
   const origData = isRenta ? nkrRentaData : nkrResaleData;
   const orig = origData.find(x=>x.id===nkrEditingId);
@@ -915,7 +1134,7 @@ function renderHaloTable() {
   const head = document.getElementById('haloTableHead');
   const body = document.getElementById('haloTableBody');
 
-  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Halo status</th><th></th>';
+  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th>Datum postavljanja</th><th>Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Halo status</th><th></th>';
 
   const q = (document.getElementById('haloSearch')?.value||'').toLowerCase();
   let rows = data.filter(r => {
@@ -1000,10 +1219,13 @@ function renderHaloRow(r, isProd) {
   const haloChip = haloMap[r.haloStatus]||'—';
   const editBtn = `<button class="btn btn-sm" onclick="openEdit('${r.id}')">✏️</button>`;
 
+  const haloCena = r.cena ? `<span style="font-size:12px;color:var(--navy)">${r.cena}</span>` : '<span style="color:var(--muted)">—</span>';
+
   return `<tr>
     <td><strong>${r.nekretnina||'—'}</strong></td>
     <td>${r.agent||'—'}</td>
     <td style="white-space:nowrap;font-size:12px">${fmtDate(parseDate(r.datum))}</td>
+    <td style="white-space:nowrap">${haloCena}</td>
     <td>${phaseBadge}</td>
     <td>${actionCell}</td>
     <td>${statusBadge}</td>
