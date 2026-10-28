@@ -449,6 +449,14 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
         <label>Datum postavljanja</label>
         <input type="text" id="fDatum" placeholder="DD.MM.YYYY">
       </div>
+      <div id="brziUvozBox" style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.5px;margin-bottom:6px">⚡ BRZI UVOZ</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="brziUvozUrl" placeholder="https://kadenasothebysrealty.com/sr/property/..." style="flex:1;font-size:12px">
+          <button class="btn btn-sm" onclick="brziUvoz()" id="brziUvozBtn" style="white-space:nowrap;font-size:12px;padding:0 12px">Uvezi</button>
+        </div>
+        <div id="brziUvozStatus" style="font-size:11px;margin-top:6px;color:var(--muted);display:none"></div>
+      </div>
       <div class="form-group" style="margin-bottom:12px">
         <label>Nekretnina</label>
         <input type="text" id="fNekretnina" placeholder="Naziv / adresa nekretnine">
@@ -1263,6 +1271,9 @@ function openAdd() {
   document.getElementById('fDatum').value = '';
   document.getElementById('deleteBtn').style.display = 'none';
   document.getElementById('editInfoBox').style.display = 'block';
+  document.getElementById('brziUvozBox').style.display = 'block';
+  document.getElementById('brziUvozUrl').value = '';
+  document.getElementById('brziUvozStatus').style.display = 'none';
   document.getElementById('overlay').classList.add('open');
 }
 
@@ -1281,12 +1292,67 @@ function openEdit(id) {
   document.getElementById('fDatum').value = r.datum||'';
   document.getElementById('deleteBtn').style.display = 'inline-block';
   document.getElementById('editInfoBox').style.display = 'block';
+  document.getElementById('brziUvozBox').style.display = 'none';
   document.getElementById('overlay').classList.add('open');
 }
 
 function closeModal() {
   document.getElementById('overlay').classList.remove('open');
   editingId = null;
+}
+
+async function brziUvoz() {
+  const url = document.getElementById('brziUvozUrl').value.trim();
+  const statusEl = document.getElementById('brziUvozStatus');
+  const btn = document.getElementById('brziUvozBtn');
+  if (!url || !url.includes('kadenasothebysrealty.com')) {
+    statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = '⚠ Unesi validan link sa kadenasothebysrealty.com';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = '⏳';
+  statusEl.style.display = 'block';
+  statusEl.style.color = 'var(--muted)';
+  statusEl.textContent = 'Učitavam stranicu...';
+  try {
+    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+    const resp = await fetch(proxyUrl);
+    const data = await resp.json();
+    const html = data.contents;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    // Extract fields
+    const agentEl = doc.querySelector('.agent-box .name');
+    const typeEl = doc.querySelector('h1 .type');
+    const locationEl = doc.querySelector('h1 .location');
+    // og:title as fallback for property name: "Dvosoban stan 68 m², Viva residences, Zvezdara"
+    const ogTitle = (doc.querySelector('meta[property="og:title"]') || doc.querySelector('meta[name="og:title"]'))?.getAttribute('content') || '';
+    // Build nekretnina name: prefer og:title stripped of " | KADENA..." suffix
+    let nekretnina = ogTitle.replace(/\s*\|.*$/, '').trim();
+    // If og:title not available, build from type + location
+    if (!nekretnina && typeEl && locationEl) {
+      nekretnina = (typeEl.textContent.trim() + ' — ' + locationEl.textContent.trim());
+    }
+    const agentName = agentEl ? agentEl.textContent.trim() : '';
+    let filled = [];
+    if (nekretnina) { document.getElementById('fNekretnina').value = nekretnina; filled.push('nekretnina'); }
+    if (agentName) { document.getElementById('fAgent').value = agentName; filled.push('agent'); }
+    if (filled.length) {
+      statusEl.style.color = 'var(--green)';
+      statusEl.textContent = '✓ Uveženo: ' + filled.join(', ');
+    } else {
+      statusEl.style.color = 'var(--red)';
+      statusEl.textContent = '⚠ Nisu pronađeni podaci — proveri link';
+    }
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = '⚠ Greška pri učitavanju: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Uvezi';
+  }
 }
 
 function saveAd() {
