@@ -390,6 +390,10 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 
       <!-- ADD mode: smart package selector -->
       <div id="nkrAddSection" style="display:none">
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Datum postavljanja</label>
+          <input type="text" id="nkrFStartDate" placeholder="DD.MM.YYYY." style="font-size:13px">
+        </div>
         <div id="nkrBrziUvozBox" style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;margin-bottom:14px">
           <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.5px;margin-bottom:6px">⚡ BRZI UVOZ</div>
           <div style="display:flex;gap:8px;align-items:center">
@@ -411,10 +415,6 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
             <label>Cena</label>
             <input type="text" id="nkrFCenaAdd" placeholder="npr. € 2.000 / mesečno">
           </div>
-        </div>
-        <div class="form-group" style="margin-top:10px">
-          <label>Datum postavljanja</label>
-          <input type="date" id="nkrFStartDate" style="font-size:13px">
         </div>
         <div class="form-group" style="margin-top:12px">
           <label>Paket oglašavanja</label>
@@ -668,7 +668,21 @@ function selectNkrPkg(pkg) {
 
 function nkrTodayStr() {
   const d = new Date();
-  return d.toISOString().split('T')[0]; // YYYY-MM-DD for <input type=date>
+  return String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear() + '.';
+}
+function nkrParseDateStr(str) {
+  // Parses DD.MM.YYYY. or DD.MM.YYYY or DD.MM.YY → ISO YYYY-MM-DD
+  if (!str) return null;
+  const m = str.trim().replace(/\.$/, '').split('.');
+  if (m.length < 3) return null;
+  const d = m[0].padStart(2,'0'), mo = m[1].padStart(2,'0');
+  let y = m[2]; if (y.length === 2) y = '20' + y;
+  if (!d || !mo || !y || y.length !== 4) return null;
+  return y + '-' + mo + '-' + d;
+}
+function nkrTodayStrOld() {
+  const d = new Date();
+  return d.toISOString().split('T')[0]; // legacy
 }
 
 function nkrAddDays(dateStr, days) {
@@ -711,7 +725,7 @@ function nkrComputeDates(pkg, startIso) {
 
 function nkrUpdatePreview() {
   const preview = document.getElementById('nkrAddPreview');
-  const startIso = document.getElementById('nkrFStartDate').value;
+  const startIso = nkrParseDateStr(document.getElementById('nkrFStartDate').value);
   if (!nkrSelectedPackage || !startIso) { preview.style.display='none'; return; }
   const d = nkrComputeDates(nkrSelectedPackage, startIso);
   const row = (label, val) => `<div class="prev-row"><span class="prev-label">${label}</span><span class="${val ? 'prev-val' : 'prev-null'}">${val || '—'}</span></div>`;
@@ -816,11 +830,12 @@ function saveNkrAd() {
   let rec;
   if (isAdd) {
     if (!nkrSelectedPackage) { alert('Izaberi paket oglašavanja!'); return; }
-    const startIso = document.getElementById('nkrFStartDate').value;
-    if (!startIso) { alert('Unesi datum početka!'); return; }
+    const startRaw = document.getElementById('nkrFStartDate').value.trim();
+    const startIso = nkrParseDateStr(startRaw);
+    if (!startIso) { alert('Unesi datum početka u formatu DD.MM.YYYY.'); return; }
     const dates = nkrComputeDates(nkrSelectedPackage, startIso);
     const urlEl = document.getElementById('nkrFUrl');
-    // datum postavljanja = datum pocetka paketa, formatiran kao DD.MM.YYYY
+    // datum postavljanja = datum pocetka paketa, formatiran kao DD.MM.YYYY.
     const startD = new Date(startIso + 'T00:00:00');
     const datumPost = String(startD.getDate()).padStart(2,'0') + '.' + String(startD.getMonth()+1).padStart(2,'0') + '.' + startD.getFullYear() + '.';
     rec = {
