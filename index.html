@@ -569,10 +569,6 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
           <label>Agent</label>
           <input type="text" id="fAgent" placeholder="Ime agenta">
         </div>
-        <div class="form-group">
-          <label>Vlasnik (opciono)</label>
-          <input type="text" id="fVlasnik" placeholder="Ime vlasnika">
-        </div>
       </div>
     </div>
     <div class="modal-actions">
@@ -1427,7 +1423,6 @@ function renderNkrRow(r, isRenta) {
   const napomena = r.napomena ? `<span class="napomena-chip">${r.napomena}</span>` : '—';
   const cena = r.cena ? `<span style="font-size:12px;color:var(--navy);display:block;text-align:right">${formatCena(r.cena)}</span>` : '<span style="display:block;text-align:right">—</span>';
   const editBtn = `<button class="btn btn-sm" onclick="openNkrEdit('${r.id}')">✏️</button>`;
-  const vlasnik = r.vlasnik ? `<span style="font-size:12px">${r.vlasnik}</span>` : '<span style="color:var(--muted)">—</span>';
 
   const nkrNaziv = r.url
     ? `<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--navy);text-decoration:none;font-weight:700" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${r.nekretnina||'—'}</a>`
@@ -1579,7 +1574,6 @@ function openAdd() {
   document.getElementById('fHaloStatus').value = 'active';
   document.getElementById('fNekretnina').value = '';
   document.getElementById('fAgent').value = '';
-  document.getElementById('fVlasnik').value = '';
   // default: danasnji datum
   const _t = new Date();
   document.getElementById('fDatum').value = String(_t.getDate()).padStart(2,'0') + '.' + String(_t.getMonth()+1).padStart(2,'0') + '.' + _t.getFullYear() + '.';
@@ -1607,7 +1601,6 @@ function openEdit(id) {
   document.getElementById('fHaloStatus').value = r.haloStatus||'active';
   document.getElementById('fNekretnina').value = r.nekretnina||'';
   document.getElementById('fAgent').value = r.agent||'';
-  document.getElementById('fVlasnik').value = r.vlasnik||'';
   document.getElementById('fDatum').value = r.datum||'';
   document.getElementById('fIstek1').value = r.istek1||'';
   document.getElementById('fObnova1').value = r.obnova1||'';
@@ -1686,7 +1679,6 @@ function saveAd() {
     haloStatus: document.getElementById('fHaloStatus').value,
     nekretnina: document.getElementById('fNekretnina').value.trim(),
     agent: document.getElementById('fAgent').value.trim(),
-    vlasnik: document.getElementById('fVlasnik').value.trim(),
     datum: document.getElementById('fDatum').value.trim(),
     istek1: document.getElementById('fIstek1').value.trim()||undefined,
     obnova1: document.getElementById('fObnova1').value.trim()||undefined,
