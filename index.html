@@ -797,16 +797,16 @@ function formatCena(val) {
   const s = String(val).trim();
   // Ako već sadrži € — vrati nepromenjeno
   if (s.includes('€')) return s;
-  // Ako je čisti broj (bez separatora), formatiraj
-  const numRaw = Number(s);
-  if (!isNaN(numRaw) && s.match(/^\d+(\.\d+)?$/)) {
-    return '€ ' + numRaw.toLocaleString('de-DE');
+  // Broj sa tačkama kao hiljadskim separatorom: "950.000", "5.000.000", "838.400"
+  // Detektuj: samo cifre i tačke, tačke na svakih 3 cifre od kraja
+  if (/^\d{1,3}(\.\d{3})*$/.test(s)) {
+    const num = Number(s.replace(/\./g, ''));
+    return '€ ' + num.toLocaleString('de-DE');
   }
-  // Ako je broj sa tačkama kao hiljadskim separatorom npr. "5.000.000"
-  const stripped = s.replace(/\./g, '');
-  const numStripped = Number(stripped);
-  if (!isNaN(numStripped) && stripped.match(/^\d+$/)) {
-    return '€ ' + numStripped.toLocaleString('de-DE');
+  // Čist broj bez separatora: "208000"
+  const num = Number(s);
+  if (!isNaN(num) && /^\d+$/.test(s)) {
+    return '€ ' + num.toLocaleString('de-DE');
   }
   // Fallback — vrati originalni string
   return s;
