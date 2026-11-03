@@ -1994,47 +1994,85 @@ function setFourZidaFilter(f) {
 }
 
 function renderFourZidaTable() {
-  const data = currentFourZidaType === 'renta' ? fourZidaRentaData : fourZidaResaleData;
+  const isRenta = currentFourZidaType === 'renta';
+  const data = isRenta ? fourZidaRentaData : fourZidaResaleData;
+  const head = document.getElementById('fzTableHead');
+  const body = document.getElementById('fzTableBody');
+
+  head.innerHTML = '<th>Nekretnina</th><th>Agent</th><th style="text-align:right">Cena</th><th>Faza</th><th>Sledeća akcija</th><th>Status</th><th>Napomena</th><th></th>';
+
   const q = (document.getElementById('fzSearch')?.value || '').toLowerCase();
   let rows = data.filter(r => {
-    if (q && !JSON.stringify(r).toLowerCase().includes(q)) return false;
+    const s = `${r.nekretnina||''} ${r.agent||''} ${r.vlasnik||''}`.toLowerCase();
+    if (q && !s.includes(q)) return false;
     if (fourZidaFilter === 'hitno') return fourZidaUrgency(r) === 'hitno';
     if (fourZidaFilter === 'uskoro') return fourZidaUrgency(r) === 'uskoro';
     return true;
   });
-  rows.sort((a,b) => fourZidaPhasePriority(a) - fourZidaPhasePriority(b));
 
-  const head = document.getElementById('fzTableHead');
-  const body = document.getElementById('fzTableBody');
-  head.innerHTML = '<th>#</th><th>Nekretnina</th><th>Agent</th><th>Cena</th><th>Faza</th><th>Premium od</th><th>Top od</th><th>Isteklo za</th><th>Napomena</th>';
-  body.innerHTML = rows.length ? rows.map((r,i) => renderFourZidaRow(r,i+1)).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:32px">Nema oglasa</td></tr>';
+  rows.sort((a,b) => {
+    const pa = fourZidaPhasePriority(a), pb = fourZidaPhasePriority(b);
+    if (pa !== pb) return pa - pb;
+    const phA = fourZidaCurrentPhase(a), phB = fourZidaCurrentPhase(b);
+    return (phA.daysLeft ?? 9999) - (phB.daysLeft ?? 9999);
+  });
+
+  if (!rows.length) {
+    body.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>Nema oglasa koji odgovaraju filteru.</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r => renderFourZidaRow(r)).join('');
 }
 
-function renderFourZidaRow(r, idx) {
+function renderFourZidaRow(r) {
   const ph = fourZidaCurrentPhase(r);
   const urg = fourZidaUrgency(r);
-  let urgIcon = '';
-  if (urg === 'hitno') urgIcon = '<span title="Hitno!">🔴</span> ';
-  else if (urg === 'uskoro') urgIcon = '<span title="Uskoro ističe">🟡</span> ';
 
-  const daysCell = ph.daysLeft !== undefined
-    ? `<span class="${urg==='hitno'?'text-red':urg==='uskoro'?'text-yellow':''}">${ph.daysLeft}d</span>`
-    : '—';
+  // Phase badge — identičan stilovima NKR/Halo
+  let phaseBadge = '<span class="phase phase-none">—</span>';
+  if (ph.phase === 'premium') phaseBadge = '<span class="phase phase-premium">Premium</span>';
+  else if (ph.phase === 'top') phaseBadge = '<span class="phase phase-standard">Top</span>';
+  else if (ph.phase === 'expired') phaseBadge = '<span class="phase phase-expired">Istekao</span>';
 
-  const urlHtml = r.url
-    ? `<a href="${r.url}" target="_blank" class="prop-link">${r.nekretnina||'—'}</a>`
-    : (r.nekretnina||'—');
+  // Sledeća akcija — isti pattern kao NKR
+  let actionCell = '—';
+  let statusBadge = '<span class="status status-na">—</span>';
 
-  return `<tr onclick="openFourZidaEdit('${r.id}')" style="cursor:pointer">
-    <td>${idx}</td>
-    <td>${urgIcon}${urlHtml}</td>
-    <td>${r.agent||'—'}</td>
-    <td>${r.cena||'—'}</td>
-    <td><span class="phase-badge ${ph.cls}">${ph.label}</span></td>
-    <td>${r.premium||'—'}</td>
-    <td>${r.top||'—'}</td>
-    <td>${daysCell}</td>
-    <td>${r.napomena||''}</td>
+  if (ph.phase === 'expired') {
+    actionCell = '<span style="color:var(--red);font-weight:600;font-size:12px">Oglas istekao!</span>';
+    statusBadge = '<span class="status status-urgent">⚠ Istekao</span>';
+  } else if (ph.phase === 'none') {
+    actionCell = '<span style="color:var(--muted);font-size:12px">Bez datuma</span>';
+  } else if (ph.endDate) {
+    const d = ph.daysLeft;
+    const nextPh = ph.phase === 'premium' ? 'Top' : 'Istekao';
+    actionCell = `<div style="font-size:12px;font-weight:600">${fmtDate(ph.endDate)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Prelaz → ${nextPh} (${d}d)</div>`;
+    if (d <= 0) statusBadge = '<span class="status status-urgent">🔴 DANAS</span>';
+    else if (d <= 2) statusBadge = '<span class="status status-urgent">🔴 Hitno</span>';
+    else if (d <= 7) statusBadge = '<span class="status status-soon">🟡 Uskoro</span>';
+    else statusBadge = '<span class="status status-ok">✓ Aktivan</span>';
+  }
+
+  const naziv = r.url
+    ? `<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--navy);text-decoration:none;font-weight:700" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${r.nekretnina||'—'}</a>`
+    : `<strong>${r.nekretnina||'—'}</strong>`;
+
+  const cena = r.cena
+    ? `<span style="font-size:12px;color:var(--navy);display:block;text-align:right">${formatCena(r.cena)}</span>`
+    : '<span style="display:block;text-align:right">—</span>';
+
+  const napomena = r.napomena ? `<span class="napomena-chip">${r.napomena}</span>` : '—';
+  const editBtn = `<button class="btn btn-sm" onclick="openFourZidaEdit('${r.id}')">✏️</button>`;
+
+  return `<tr>
+    <td>${naziv}</td>
+    <td><span style="font-size:12px">${r.agent||'—'}</span></td>
+    <td style="white-space:nowrap;text-align:right">${cena}</td>
+    <td>${phaseBadge}</td>
+    <td>${actionCell}</td>
+    <td>${statusBadge}</td>
+    <td>${napomena}</td>
+    <td>${editBtn}</td>
   </tr>`;
 }
 
