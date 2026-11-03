@@ -794,12 +794,22 @@ function nkrAgentName(raw) {
 
 function formatCena(val) {
   if (!val) return '—';
-  // Ako je čisti broj, formatiraj sa tačkama na hiljadama
-  const num = Number(val);
-  if (!isNaN(num) && String(val).trim().match(/^\d+(\.\d+)?$/)) {
-    return '€ ' + num.toLocaleString('de-DE');
+  const s = String(val).trim();
+  // Ako već sadrži € — vrati nepromenjeno
+  if (s.includes('€')) return s;
+  // Ako je čisti broj (bez separatora), formatiraj
+  const numRaw = Number(s);
+  if (!isNaN(numRaw) && s.match(/^\d+(\.\d+)?$/)) {
+    return '€ ' + numRaw.toLocaleString('de-DE');
   }
-  return val;
+  // Ako je broj sa tačkama kao hiljadskim separatorom npr. "5.000.000"
+  const stripped = s.replace(/\./g, '');
+  const numStripped = Number(stripped);
+  if (!isNaN(numStripped) && stripped.match(/^\d+$/)) {
+    return '€ ' + numStripped.toLocaleString('de-DE');
+  }
+  // Fallback — vrati originalni string
+  return s;
 }
 
 let nkrEditingId = null;
