@@ -453,9 +453,15 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
       <!-- EDIT mode: manual date fields -->
       <div id="nkrEditSection">
 
-        <div class="form-group" style="margin-bottom:12px">
-          <label>Nekretnina</label>
-          <input type="text" id="nkrFNekretnina" placeholder="Naziv / adresa">
+        <div class="form-row" style="margin-bottom:4px">
+          <div class="form-group" style="flex:2">
+            <label>Nekretnina</label>
+            <input type="text" id="nkrFNekretnina" placeholder="Naziv / adresa">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label>Datum postavljanja</label>
+            <input type="text" id="nkrFDatum" placeholder="DD.MM.YYYY.">
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -568,6 +574,10 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
         <div class="form-group">
           <label>Agent</label>
           <input type="text" id="fAgent" placeholder="Ime agenta">
+        </div>
+        <div class="form-group">
+          <label>Cena (opciono)</label>
+          <input type="text" id="fCena" placeholder="npr. €250,000 ili €2.500/mes">
         </div>
       </div>
     </div>
@@ -816,6 +826,7 @@ function openNkrEdit(id) {
   document.getElementById('nkrModalTitle').textContent = 'Izmeni NKR oglas';
   document.getElementById('nkrEditId').value = id;
   document.getElementById('nkrFNekretnina').value = r.nekretnina||'';
+  document.getElementById('nkrFDatum').value = r.datum||'';
   document.getElementById('nkrFAgent').value = nkrAgentName(r.agent);
   document.getElementById('nkrFCena').value = r.cena||'';
   document.getElementById('nkrFPremium').value = r.premium||'';
@@ -890,6 +901,7 @@ function saveNkrAd() {
     rec = {
       id: nkrEditingId,
       nekretnina: document.getElementById('nkrFNekretnina').value.trim(),
+      datum: document.getElementById('nkrFDatum').value.trim() || null,
       agent: document.getElementById('nkrFAgent').value.trim(),
       cena: document.getElementById('nkrFCena').value.trim(),
       premium: document.getElementById('nkrFPremium').value.trim() || null,
@@ -1008,6 +1020,41 @@ function parseDate(str) {
 // ============================================================
 // HALO – SCHEDULE COMPUTATION
 // ============================================================
+
+// Ako oglas ima stvarne datume (istek1, obnova1...), koristi njih
+// umesto da računa iz datum + pravila
+function computeHaloScheduleFromRecord(r, type) {
+  // Ako postoje stvarni datumi iz Excel-a, koristi njih
+  if (r.istek1 || r.obnova1 || r.istek2 || r.obnova2 || r.istek3) {
+    const phases = [];
+    // Faza 1: od datum do istek1
+    const start1 = parseDate(r.datum);
+    const end1 = parseDate(r.istek1);
+    if (start1 && end1) {
+      const phase1 = (type === 'prodaja') ? 'Premium' : 'Top';
+      const renew1 = parseDate(r.obnova1) || addDays(end1, 1);
+      phases.push({ phase: phase1, start: start1, end: end1, renew: renew1 });
+    }
+    // Faza 2: od obnova1 do istek2
+    const start2 = parseDate(r.obnova1);
+    const end2 = parseDate(r.istek2);
+    if (start2 && end2) {
+      const phase2 = (type === 'prodaja') ? 'Premium' : 'Top';
+      const renew2 = parseDate(r.obnova2) || addDays(end2, 1);
+      phases.push({ phase: phase2, start: start2, end: end2, renew: renew2 });
+    }
+    // Faza 3: od obnova2 do istek3 (Standard)
+    const start3 = parseDate(r.obnova2);
+    const end3 = parseDate(r.istek3);
+    if (start3 && end3) {
+      phases.push({ phase: 'Standard', start: start3, end: end3, renew: null });
+    }
+    if (phases.length > 0) return phases;
+  }
+  // Fallback: računaj iz datum + pravila
+  return computeHaloSchedule(r.datum, type);
+}
+
 function computeHaloSchedule(startISO, type) {
   const s = parseDate(startISO);
   if (!s) return null;
@@ -1197,20 +1244,20 @@ function renderHaloTable() {
   if (haloFilter === 'hitno') {
     rows = rows.filter(r => {
       if (r.haloStatus !== 'active' && r.haloStatus !== 'never_remove') return false;
-      const na = nextAction(computeHaloSchedule(r.datum, currentHaloType));
+      const na = nextAction(computeHaloScheduleFromRecord(r, currentHaloType));
       return na && na.days <= 2;
     });
   } else if (haloFilter === 'uskoro') {
     rows = rows.filter(r => {
       if (r.haloStatus !== 'active' && r.haloStatus !== 'never_remove') return false;
-      const na = nextAction(computeHaloSchedule(r.datum, currentHaloType));
+      const na = nextAction(computeHaloScheduleFromRecord(r, currentHaloType));
       return na && na.days > 2 && na.days <= 7;
     });
   }
 
   rows.sort((a,b) => {
-    const na = nextAction(computeHaloSchedule(a.datum, currentHaloType));
-    const nb = nextAction(computeHaloSchedule(b.datum, currentHaloType));
+    const na = nextAction(computeHaloScheduleFromRecord(a, currentHaloType));
+    const nb = nextAction(computeHaloScheduleFromRecord(b, currentHaloType));
     return (na?na.days:9999) - (nb?nb.days:9999);
   });
 
@@ -1235,7 +1282,7 @@ function renderHaloRow(r, isProd) {
       if (rentaMatch && rentaMatch.cena) r = {...r, cena: rentaMatch.cena};
     }
   }
-  const sch = computeHaloSchedule(r.datum, type);
+  const sch = computeHaloScheduleFromRecord(r, type);
   const cp = currentPhase(sch);
   const na = nextAction(sch);
 
@@ -1321,12 +1368,12 @@ function updateHaloAlertBar(data) {
   const type = currentHaloType;
   const urgent = data.filter(r => {
     if (r.haloStatus !== 'active') return false;
-    const na = nextAction(computeHaloSchedule(r.datum, type));
+    const na = nextAction(computeHaloScheduleFromRecord(r, type));
     return na && na.days <= 1;
   });
   const expired = data.filter(r => {
     if (r.haloStatus !== 'active') return false;
-    return currentPhase(computeHaloSchedule(r.datum, type))?.phase === 'Expired';
+    return currentPhase(computeHaloScheduleFromRecord(r, type))?.phase === 'Expired';
   });
   if (expired.length) {
     bar.style.display='flex'; bar.className='alert-bar';
@@ -1452,7 +1499,7 @@ function renderStats() {
     const counts = {};
     data.forEach(r => {
       if (r.haloStatus === 'kir' || r.haloStatus === 'hidden') return;
-      const cp = currentPhase(computeHaloSchedule(r.datum, type));
+      const cp = currentPhase(computeHaloScheduleFromRecord(r, type));
       const raw = r.haloStatus === 'never_remove' ? 'Uvek aktivan' : (cp?.phase || 'Bez datuma');
       const ph = phaseLabel(raw);
       counts[ph] = (counts[ph]||0) + 1;
@@ -1473,7 +1520,7 @@ function renderStats() {
   const totalActive = (data) => data.filter(x => x.haloStatus==='active'||x.haloStatus==='never_remove').length;
   const totalExp = (data, type) => data.filter(r => {
     if (r.haloStatus!=='active') return false;
-    return currentPhase(computeHaloSchedule(r.datum, type))?.phase === 'Expired';
+    return currentPhase(computeHaloScheduleFromRecord(r, type))?.phase === 'Expired';
   }).length;
 
   document.getElementById('statsGrid').innerHTML = `
@@ -1574,6 +1621,7 @@ function openAdd() {
   document.getElementById('fHaloStatus').value = 'active';
   document.getElementById('fNekretnina').value = '';
   document.getElementById('fAgent').value = '';
+  document.getElementById('fCena').value = '';
   // default: danasnji datum
   const _t = new Date();
   document.getElementById('fDatum').value = String(_t.getDate()).padStart(2,'0') + '.' + String(_t.getMonth()+1).padStart(2,'0') + '.' + _t.getFullYear() + '.';
@@ -1601,6 +1649,7 @@ function openEdit(id) {
   document.getElementById('fHaloStatus').value = r.haloStatus||'active';
   document.getElementById('fNekretnina').value = r.nekretnina||'';
   document.getElementById('fAgent').value = r.agent||'';
+  document.getElementById('fCena').value = r.cena||'';
   document.getElementById('fDatum').value = r.datum||'';
   document.getElementById('fIstek1').value = r.istek1||'';
   document.getElementById('fObnova1').value = r.obnova1||'';
@@ -1634,10 +1683,18 @@ async function brziUvoz() {
   statusEl.style.color = 'var(--muted)';
   statusEl.textContent = 'Učitavam stranicu...';
   try {
-    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-    const resp = await fetch(proxyUrl);
-    const data = await resp.json();
-    const html = data.contents;
+    // Probaj više proxy-a redom
+    let html = null;
+    const proxies = [
+      async () => { const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(url)); if (r.ok) return r.text(); return null; },
+      async () => { const r = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url)); const d = await r.json(); return d.contents || null; },
+      async () => { const r = await fetch('https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(url)); if (r.ok) return r.text(); return null; },
+    ];
+    for (const tryProxy of proxies) {
+      try { html = await Promise.race([tryProxy(), new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000))]); } catch(_) {}
+      if (html && html.length > 500) break;
+    }
+    if (!html || html.length < 500) throw new Error('Nije moguće učitati stranicu — proveri vezu ili link');
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     // Extract fields
@@ -1679,6 +1736,7 @@ function saveAd() {
     haloStatus: document.getElementById('fHaloStatus').value,
     nekretnina: document.getElementById('fNekretnina').value.trim(),
     agent: document.getElementById('fAgent').value.trim(),
+    cena: document.getElementById('fCena').value.trim()||undefined,
     datum: document.getElementById('fDatum').value.trim(),
     istek1: document.getElementById('fIstek1').value.trim()||undefined,
     obnova1: document.getElementById('fObnova1').value.trim()||undefined,
