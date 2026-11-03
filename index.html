@@ -1002,7 +1002,7 @@ function fmtDate(d) {
 function parseDate(str) {
   if (!str || typeof str !== 'string') return null;
   str = str.trim();
-  let m = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  let m = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})\.?$/);
   if (m) return new Date(+m[3], +m[2]-1, +m[1]);
   m = str.match(/^(\d{1,2})\.(\d{1,2})\.?$/);
   if (m) {
