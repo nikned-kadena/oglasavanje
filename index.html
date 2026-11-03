@@ -1255,9 +1255,19 @@ function renderHaloTable() {
     });
   }
 
+  const haloPhasePriority = {'Premium':0,'Top':0,'Standard':1,'Expired':2,'Uvek aktivan':3};
   rows.sort((a,b) => {
-    const na = nextAction(computeHaloScheduleFromRecord(a, currentHaloType));
-    const nb = nextAction(computeHaloScheduleFromRecord(b, currentHaloType));
+    const schA = computeHaloScheduleFromRecord(a, currentHaloType);
+    const schB = computeHaloScheduleFromRecord(b, currentHaloType);
+    const cpA = currentPhase(schA);
+    const cpB = currentPhase(schB);
+    const phA = a.haloStatus==='never_remove' ? 'Uvek aktivan' : (cpA?.phase||'Expired');
+    const phB = b.haloStatus==='never_remove' ? 'Uvek aktivan' : (cpB?.phase||'Expired');
+    const prioA = haloPhasePriority[phA] ?? 2;
+    const prioB = haloPhasePriority[phB] ?? 2;
+    if (prioA !== prioB) return prioA - prioB;
+    const na = nextAction(schA);
+    const nb = nextAction(schB);
     return (na?na.days:9999) - (nb?nb.days:9999);
   });
 
@@ -1415,7 +1425,15 @@ function renderNkrTable() {
     });
   }
 
+  const nkrPhasePriority = {'Premium':0,'Standard':1,'Lite':2,'Expired':3,'Bez datuma':4};
   rows.sort((a,b) => {
+    const cpA = nkrCurrentPhase(a);
+    const cpB = nkrCurrentPhase(b);
+    const phA = cpA?.phase || 'Bez datuma';
+    const phB = cpB?.phase || 'Bez datuma';
+    const prioA = nkrPhasePriority[phA] ?? 3;
+    const prioB = nkrPhasePriority[phB] ?? 3;
+    if (prioA !== prioB) return prioA - prioB;
     const na = nkrNextTransition(a);
     const nb = nkrNextTransition(b);
     return (na?na.days:9999) - (nb?nb.days:9999);
