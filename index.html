@@ -203,6 +203,7 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 <div class="tabs">
   <div class="tab active" onclick="switchMainTab('halo')">🏠 Halo Oglasi</div>
   <div class="tab" onclick="switchMainTab('nkr')">🏢 Nekretnine.rs</div>
+  <div class="tab" onclick="switchMainTab('fourzida')">🔷 4Zida</div>
   <div class="tab" onclick="switchMainTab('stats')">📊 Statistike</div>
   <div class="tab" onclick="switchMainTab('pravila')">⚙️ Pravila</div>
 </div>
@@ -276,6 +277,40 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
 </div>
 
 <!-- ============================================================ -->
+<!-- 4ZIDA TAB -->
+<!-- ============================================================ -->
+<div id="tab-fourzida" class="content" style="display:none">
+  <div class="sub-tabs">
+    <div class="sub-tab active" id="fzSubResale" onclick="switchFourZidaType('resale')">
+      PRODAJA <span class="badge" id="badge4zResale">—</span>
+    </div>
+    <div class="sub-tab" id="fzSubRenta" onclick="switchFourZidaType('renta')">
+      RENTA <span class="badge" id="badge4zRenta">—</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="filters">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Pretraži..." id="fzSearch" oninput="renderFourZidaTable()" style="height:36px">
+      </div>
+      <button class="btn btn-sm active" id="fzFilterAll" onclick="setFourZidaFilter('sve')">Sve</button>
+      <button class="btn btn-sm" id="fzFilterUrgent" onclick="setFourZidaFilter('hitno')">🔴 Hitno</button>
+      <button class="btn btn-sm" id="fzFilterSoon" onclick="setFourZidaFilter('uskoro')">🟡 Uskoro</button>
+      <button class="btn btn-gold btn-sm" onclick="openFourZidaAdd()" style="margin-left:8px">+ Dodaj oglas</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr id="fzTableHead"></tr></thead>
+      <tbody id="fzTableBody">
+        <tr><td colspan="8"><div class="loading"><div class="spinner"></div>Učitavanje...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
 <!-- STATISTIKE TAB -->
 <!-- ============================================================ -->
 <div id="tab-stats" class="content" style="display:none">
@@ -301,6 +336,16 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
     <div class="chart-card">
       <div class="chart-title">Nekretnine.rs – Resale po fazi</div>
       <div id="chartNkrResale"></div>
+    </div>
+  </div>
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">4Zida – Renta po fazi</div>
+      <div id="chartFzRenta"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">4Zida – Resale po fazi</div>
+      <div id="chartFzResale"></div>
     </div>
   </div>
 </div>
@@ -373,6 +418,20 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
       <div class="form-group">
         <label>Lite trajanje (dani)</label>
         <input type="number" id="r_nkrLiteDays" min="1" max="90" value="30">
+      </div>
+    </div>
+  </div>
+
+  <div class="rules-card">
+    <div class="rules-title">🔷 4Zida – Renta i Prodaja</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Premium trajanje (dani)</label>
+        <input type="number" id="r_fzPremDays" min="1" max="90" value="30">
+      </div>
+      <div class="form-group">
+        <label>Top trajanje (dani)</label>
+        <input type="number" id="r_fzTopDays" min="1" max="90" value="30">
       </div>
     </div>
   </div>
@@ -501,6 +560,105 @@ input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--
   </div>
 </div>
 
+<!-- 4Zida Edit Modal -->
+<div class="overlay" id="fzOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <span id="fzModalTitle">Izmeni 4Zida oglas</span>
+      <button class="modal-close" onclick="closeFourZidaModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fzEditId">
+      <input type="hidden" id="fzIsAdd" value="0">
+
+      <!-- ADD mode -->
+      <div id="fzAddSection" style="display:none">
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Datum postavljanja</label>
+          <input type="text" id="fzFStartDate" placeholder="DD.MM.YYYY." style="font-size:13px">
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Nekretnina</label>
+          <input type="text" id="fzFNekretninaAdd" placeholder="Naziv / adresa">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Agent</label>
+            <input type="text" id="fzFAgentAdd" placeholder="Ime agenta">
+          </div>
+          <div class="form-group">
+            <label>Cena</label>
+            <input type="text" id="fzFCenaAdd" placeholder="npr. € 2.000 / mesečno">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label>Paket oglašavanja</label>
+          <div id="fzPackagePicker" style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+            <button class="pkg-btn" data-pkg="premium" onclick="selectFzPkg('premium')">
+              <span class="pkg-icon">⭐</span>
+              <span class="pkg-name">Premium</span>
+              <span class="pkg-dur" id="fzPkgDurPremium"></span>
+            </button>
+            <button class="pkg-btn" data-pkg="top" onclick="selectFzPkg('top')">
+              <span class="pkg-icon">🔶</span>
+              <span class="pkg-name">Top</span>
+              <span class="pkg-dur" id="fzPkgDurTop"></span>
+            </button>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:10px">
+          <label>Napomena</label>
+          <input type="text" id="fzFNapomenaAdd" placeholder="Opcionalno">
+        </div>
+        <div id="fzAddPreview" style="margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border);font-size:12px;color:var(--muted);display:none"></div>
+      </div>
+
+      <!-- EDIT mode -->
+      <div id="fzEditSection">
+        <div class="form-row" style="margin-bottom:4px">
+          <div class="form-group" style="flex:2">
+            <label>Nekretnina</label>
+            <input type="text" id="fzFNekretnina" placeholder="Naziv / adresa">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label>Datum postavljanja</label>
+            <input type="text" id="fzFDatum" placeholder="DD.MM.YYYY.">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Agent</label>
+            <input type="text" id="fzFAgent" placeholder="Ime agenta">
+          </div>
+          <div class="form-group">
+            <label>Cena</label>
+            <input type="text" id="fzFCena" placeholder="npr. € 2.000 / mesečno">
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:8px">
+          <div class="form-group">
+            <label>Premium od</label>
+            <input type="text" id="fzFPremium" placeholder="DD.MM.">
+          </div>
+          <div class="form-group">
+            <label>Top od</label>
+            <input type="text" id="fzFTop" placeholder="DD.MM.">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:8px">
+          <label>Napomena</label>
+          <input type="text" id="fzFNapomena" placeholder="Opcionalno">
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeFourZidaModal()">Otkaži</button>
+      <button class="btn btn-danger btn-sm" id="fzDeleteBtn" onclick="deleteFourZidaAd()" style="display:none;margin-right:auto">🗑 Obriši</button>
+      <button class="btn btn-gold" onclick="saveFourZidaAd()">Sačuvaj lokalno</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="modal-head">
@@ -602,6 +760,14 @@ let localEdits = {};
 let nkrRentaBase = [], nkrResaleBase = [];
 let nkrRentaData = [], nkrResaleData = [];
 
+// 4Zida
+let fourZidaRentaBase = [], fourZidaResaleBase = [];
+let fourZidaRentaData = [], fourZidaResaleData = [];
+let fourZidaEditingId = null;
+let currentFourZidaType = 'resale';
+let fourZidaFilter = 'sve';
+let fourZidaSelectedPackage = null;
+
 // Agent mapping: NKR kratka → puna imena
 const NKR_AGENT_MAP = {
   'ANĐELA': 'Anđela Vučić',
@@ -641,7 +807,8 @@ let nkrEditingId = null;
 let rules = {
   premDays:15, premRep:2, stdDaysProd:30,
   topDays:15, topRep:2, stdDaysRenta:30,
-  nkrPremDays:30, nkrStdDays:30, nkrLiteDays:30
+  nkrPremDays:30, nkrStdDays:30, nkrLiteDays:30,
+  fzPremDays:30, fzTopDays:30
 };
 
 let currentMainTab = 'halo';
@@ -696,6 +863,19 @@ function mergeNkrData() {
   nkrResaleData = [...nsBase, ...nsEdits].filter(r => !nsDeleted.has(r.id));
 }
 
+function mergeFourZidaData() {
+  const frEdits = (localEdits['4zida_renta'] || []);
+  const fsEdits = (localEdits['4zida_resale'] || []);
+  const frDeleted = new Set((localEdits['4zida_renta_deleted'] || []));
+  const fsDeleted = new Set((localEdits['4zida_resale_deleted'] || []));
+  const frLocalIds = new Set(frEdits.map(r=>r.id));
+  const fsLocalIds = new Set(fsEdits.map(r=>r.id));
+  const frBase = fourZidaRentaBase.filter(r => !frLocalIds.has(r.id) && !frDeleted.has(r.id));
+  const fsBase = fourZidaResaleBase.filter(r => !fsLocalIds.has(r.id) && !fsDeleted.has(r.id));
+  fourZidaRentaData = [...frBase, ...frEdits].filter(r => !frDeleted.has(r.id));
+  fourZidaResaleData = [...fsBase, ...fsEdits].filter(r => !fsDeleted.has(r.id));
+}
+
 // NKR add mode state
 let nkrSelectedPackage = null;
 
@@ -707,7 +887,7 @@ function nkrSetMode(isAdd) {
 
 function selectNkrPkg(pkg) {
   nkrSelectedPackage = pkg;
-  document.querySelectorAll('.pkg-btn').forEach(b => b.classList.toggle('selected', b.dataset.pkg === pkg));
+  document.querySelectorAll('#nkrPackagePicker .pkg-btn').forEach(b => b.classList.toggle('selected', b.dataset.pkg === pkg));
   nkrUpdatePreview();
 }
 
@@ -957,6 +1137,58 @@ const RENTA_HALO_DATA = [{"nekretnina":"BW-VER-909","agent":"Sanja Stanojević",
 const NKR_RENTA_DATA = [{"id": "nkr000","nekretnina": "Južni bulevar stan S23","vlasnik": "Zora Pozman","cena": "€ 2.400 / mesečno","agent": "ANĐELA","premium": null,"standard": "23.06.","lite": "20.10.","napomena": null},{"id": "nkr001","nekretnina": "Bulevar kralja Aleksandra 142B, stan A.2.3","vlasnik": "Bojana Kujundžić","cena": "€ 1.000 / mesečno","agent": "MILICA","premium": null,"standard": "23.06.","lite": "20.10.","napomena": null},{"id": "nkr002","nekretnina": "Čika-Ljubina 1, stan 6","vlasnik": "Hans i Dušica Bibus","cena": "€ 1.300 / mesečno","agent": "MARIJA","premium": null,"standard": "26.06.","lite": "20.10.","napomena": null},{"id": "nkr003","nekretnina": "BW-LIB-1401","vlasnik": "Đorđe Đorđević","cena": "€ 4.500 / mesečno","agent": "ANĐELA","premium": null,"standard": "26.06.","lite": "20.10.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/1401-2/"},{"id": "nkr004","nekretnina": "Ljutice Bogdana 34","vlasnik": "Miloš Vuković","cena": "€ 11.000 / mesečno","agent": "ANA RALEVSKI","premium": "06.08.","standard": "07.09.","lite": "08.10.","napomena": "prva stranica"},{"id": "nkr005","nekretnina": "Airport Garden, Dolce vita Tošin bunar 224","vlasnik": "SPORTSKI CENTAR VIZURA\n DOO BEOGRAD-NOVI BEOGRAD","cena": "€ 10.000 / mesečno","agent": "MARIJA","premium": "27.06.","standard": "28.07.","lite": "29.09.","napomena": "prva stranica"},{"id": "nkr006","nekretnina": "Malog Radojice 1_stan 1 i 2","vlasnik": "Svetlana Vujović","cena": "€ 6.000 / mesečno","agent": "SLAĐANA","premium": "27.06.","standard": "28.07.","lite": "29.08.","napomena": "prva stranica"},{"id": "nkr007","nekretnina": "BW-REG-3704","vlasnik": "Mirko Novakovic","cena": "€ 8.000 / mesečno","agent": "ANĐELA","premium": null,"standard": "27.06.","lite": "28.06.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/3704-2/"},{"id": "nkr008","nekretnina": "Soul 64 Q603","vlasnik": "Mirjana Lončarević","cena": "€ 2.000 / mesečno","agent": "ANĐELA","premium": null,"standard": null,"lite": "29.06.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/q603-2/"},{"id": "nkr009","nekretnina": "BW-REG-3805","vlasnik": "Slavica Kecman","cena": "€ 13.000 / mesečno","agent": "MARIJA","premium": "02.07.","standard": "03.08.","lite": "04.09.","napomena": "prva stranica","url": "https://kadenasothebysrealty.com/sr/property/3805-2/"},{"id": "nkr010","nekretnina": "BW-REG-2901","vlasnik": "Michael Feider","cena": "€ 2.700 / mesečno","agent": "MARIJA","premium": null,"standard": "28.07.","lite": "28.08.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/2901-2/"},{"id": "nkr011","nekretnina": "Soul 64, stan A205","vlasnik": "Slavica Miljković","cena": "€ 900 / mesečno","agent": "JOVANA ANGELOVSKI","premium": null,"standard": "11.08.","lite": "12.09.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/a205-2/"},{"id": "nkr012","nekretnina": "Bulevar Mihaila Pupina 3, stan 75","vlasnik": "Isidora Knežević Krstić i Tijana Knežević Đurić","cena": "€ 2.500 / mesečno","agent": "MILICA","premium": null,"standard": null,"lite": "03.09.","napomena": null},{"id": "nkr013","nekretnina": "BW-QEN-310","vlasnik": "Ivana Drašković","cena": "€ 2.700 / mesečno","agent": "SANJA STANOJEVIĆ","premium": null,"standard": "19.08.","lite": "20.09.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/310-2/"},{"id": "nkr014","nekretnina": "SOUL 64_D308","vlasnik": "Bojan Ćirković","cena": "€ 1.200 / mesečno","agent": "SANJA STANOJEVIĆ","premium": null,"standard": "21.08.","lite": "22.09.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/d308-2/"},{"id": "nkr015","nekretnina": "Istarska 30","vlasnik": "Oliveru Jakovljević-Rialas","cena": "€ 7.000 / mesečno","agent": "SLAĐANA","premium": "24.08.","standard": "25.09.","lite": "26.10.","napomena": null},{"id": "nkr016","nekretnina": "Terazije 43, stan 5","vlasnik": "Isidora Knežević Krstić i Tijana Knežević Đurić","cena": "€ 2.500 / mesečno","agent": "MILICA ŠKORIĆ","premium": null,"standard": null,"lite": "03.09.","napomena": null},{"id": "nkr017","nekretnina": "BW St. Regis Residences 2005","vlasnik": "Jelena Jerotijević","cena": "€ 2.500 / mesečno","agent": "MARIJA","premium": null,"standard": "29.09.","lite": "30.10.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/2005-2/"},{"id": "nkr018","nekretnina": "BW-RIV-308","vlasnik": "Jelena Jerotijević","cena": "Price upon request\n€ 2.000 / mesečno","agent": "MARIJA","premium": null,"standard": "29.09.","lite": "30.10.","napomena": "prva stranica","url": "https://kadenasothebysrealty.com/sr/property/308-2/"},{"id": "nkr019","nekretnina": "SOUL 64, stan B704","vlasnik": "Aleksandar Jovanović","cena": "€ 1.200 / mesečno","agent": "MILICA","premium": null,"standard": null,"lite": "30.09.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/b704-2/"},{"id": "nkr020","nekretnina": "Sakura Park_LOKAL","vlasnik": "Goldberg Real Estate doo Beograd","cena": "€ 4.500 / mesečno","agent": "NINA","premium": "20.10.","standard": "21.11.","lite": "22.12.","napomena": null},{"id": "nkr021","nekretnina": "Vajara Đoke Jovanovica 14_stan 2","vlasnik": "Ljubiša Vučinić","cena": "€ 3.500 / mesečno","agent": "SLAĐANA","premium": null,"standard": "30.09.","lite": "31.10.","napomena": null},{"id": "nkr022","nekretnina": "Drinićka 2A","vlasnik": "Aleksandar Milovanović","cena": "€ 2.500 / mesečno","agent": "ANA RALEVSKI","premium": null,"standard": "30.09.","lite": "31.10.","napomena": null},{"id": "nkr023","nekretnina": "Mome Kapora 12_Merin plaza_stan 17","vlasnik": "Jelena Petrović","cena": "€ 5.000 / mesečno","agent": "MARIJA","premium": "30.09.","standard": "31.10.","lite": "02.11.","napomena": "prva strana","url": "https://kadenasothebysrealty.com/sr/property/17-2/"},{"id": "nkr024","nekretnina": "Vila Lavanda","vlasnik": "Anja Freifrau Knyphausen_Mihaila Avramovića 43","cena": "€ 5.700 / mesečno","agent": "ANĐELA","premium": null,"standard": "15.10.","lite": "16.11.","napomena": null},{"id": "nkr025","nekretnina": "Strahinjića Bana 17-19, stan br18","vlasnik": "Željka Demane Debih","cena": "€ 3.000 / mesečno","agent": "MARIJA","premium": null,"standard": "16.10.","lite": "17.11.","napomena": "prva strana"},{"id": "nkr026","nekretnina": "Vlajkovićeva 16, stan 2","vlasnik": "Zotovic","cena": "€ 1.500 / mesečno","agent": "MARIJA","premium": null,"standard": "06.10.","lite": "07.11.","napomena": "prva strana"},{"id": "nkr027","nekretnina": "Resavska 59_stan 3","vlasnik": "Vićentije Petrović","cena": "€ 4.000 / mesečno","agent": "ANA RALEVSKI","premium": null,"standard": "07.10.","lite": "08.11.","napomena": "prva stranica"},{"id": "nkr028","nekretnina": "Obalskih radnika 3","vlasnik": "Renata Pindžo","cena": "€ 1.900 / mesečno","agent": "ANA RALEVSKI","premium": null,"standard": "12.10.","lite": "13.11.","napomena": "Treba da bude STANDARD"},{"id": "nkr029","nekretnina": "Soul 64_E303","vlasnik": "Predrag Sredojević","cena": "€ 1.300 / mesečno","agent": "JOVANA","premium": null,"standard": "12.10.","lite": "13.11.","napomena": "prva stranica","url": "https://kadenasothebysrealty.com/sr/property/e303-2/"},{"id": "nkr030","nekretnina": "Borislava Pekića 9, stan broj 4","vlasnik": "Nikola Mihajlović","cena": "€ 3.200 / mesečno","agent": "MARIJA","premium": null,"standard": "16.10.","lite": "17.11.","napomena": null},{"id": "nkr031","nekretnina": "Loznička 7, stan 1","vlasnik": "Duško Tošić","cena": "€ 3.000 / mesečno","agent": "NINA","premium": null,"standard": "19.10.","lite": "20.11.","napomena": null},{"id": "nkr032","nekretnina": "Joce Jovanovića 9_stan 21","vlasnik": "Vasilija Šuljagić","cena": "€ 1.300 / mesečno","agent": "ANA RALEVSKI","premium": null,"standard": "19.10.","lite": "20.11.","napomena": "Treba da bude STANDARD"},{"id": "nkr033","nekretnina": "Umčarska 1","vlasnik": "Slobodan Đorić","cena": "€ 2.400 / mesečno","agent": "TIJANA","premium": null,"standard": "20.10.","lite": "21.11.","napomena": "Treba da bude STANDARD"},{"id": "nkr034","nekretnina": "Soul 64_B802","vlasnik": "Ognjen Bošković","cena": "€ 2.100 / mesečno","agent": "SLAĐANA","premium": null,"standard": "20.10.","lite": "21.11.","napomena": null,"url": "https://kadenasothebysrealty.com/sr/property/b802-2/"},{"id": "nkr035","nekretnina": "BW-NIK-510","vlasnik": "Marko Milenković","cena": "€ 1.800 / mesečno","agent": "MILICA","premium": null,"standard": "26.10.","lite": "27.11.","napomena": "od","url": "https://kadenasothebysrealty.com/sr/property/510-2/"},{"id": "nkr036","nekretnina": "BW-KIN-615","vlasnik": "Jelena Ćorić","cena": "€ 1.500 / mesečno","agent": "MARIJA","premium": null,"standard": "26.10.","lite": null,"napomena": "prva strana","url": "https://kadenasothebysrealty.com/sr/property/615-2/"},{"id": "nkr037","nekretnina": "BW-REG-3301","vlasnik": "DOM WORLD DOO","cena": "Price upon request \n € 4.000 / mesečno","agent": "MARIJA","premium": "26.10.","standard": null,"lite": null,"napomena": "prva strana","url": "https://kadenasothebysrealty.com/sr/property/3301-2/"},{"id": "nkr038","nekretnina": "BW-REG-3309","vlasnik": "DOM WORLD DOO","cena": "Price upon request \n € 6.000 / mesečno","agent": "MARIJA","premium": null,"standard": "26.10.","lite": null,"napomena": "prva strana","url": "https://kadenasothebysrealty.com/sr/property/3309-2/"}];
 const NKR_RESALE_DATA = [{"id":"res000","nekretnina":"West 65_40.01","vlasnik":"","cena":"5000000","agent":"ANDJELA","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/40-1-2/"},{"id":"res001","nekretnina":"ZONED","vlasnik":"","cena":"365000","agent":"ANDJELA","premium":null,"standard":"07.08.","lite":"08.09.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/102-2/"},{"id":"res002","nekretnina":"Čelopečka 4, Zvezdara, Zahumska","vlasnik":"","cena":"470000","agent":"JOVANA","premium":null,"standard":"17.06.","lite":"18.07.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1-2/"},{"id":"res003","nekretnina":"Knez Mihailova 18/A","vlasnik":"","cena":"495000","agent":"TIJANA JANKOVIĆ","premium":null,"standard":"18.06.","lite":"19.07.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/18-2/"},{"id":"res004","nekretnina":"Vojvode Stepe 081_stan 26","vlasnik":"","cena":"459000","agent":"MILICA ŠKORIĆ","premium":null,"standard":"18.06.","lite":"19.07.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/26-4/"},{"id":"res005","nekretnina":"BW-PER-906","vlasnik":"","cena":"950000","agent":"ANDJELA","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/906-2/"},{"id":"res006","nekretnina":"BW-TER-903","vlasnik":"","cena":"1220000","agent":"TIJANA JANKOVIĆ","premium":"03.07.","standard":"04.08.","lite":"05.09.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/903-2/"},{"id":"res007","nekretnina":"BW-REG-3102","vlasnik":"","cena":"599000","agent":"NINA","premium":"18.06.","standard":"19.07.","lite":"20.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3102-2/"},{"id":"res008","nekretnina":"BW-MET-A209","vlasnik":"","cena":"170000","agent":"MARIJA","premium":null,"standard":"18.06.","lite":"19.07.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/a209-2/"},{"id":"res009","nekretnina":"Generala Nikodija Stefanovića 3","vlasnik":"","cena":"5200000","agent":"MARIJA","premium":"07.08.","standard":"08.09.","lite":"09.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3-4/"},{"id":"res010","nekretnina":"Senjačka 048","vlasnik":"","cena":"5500000","agent":"MARIJA","premium":"18.06.","standard":"19.07.","lite":"20.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/48-4/"},{"id":"res011","nekretnina":"Nikole Pašića 193, Mladenovac, vila Vista","vlasnik":"","cena":"395000","agent":"ANĐELA","premium":null,"standard":"17.06.","lite":"18.07.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/193-2/"},{"id":"res012","nekretnina":"Tadije Sondermajera 1, stan 40, wellport","vlasnik":"","cena":"525000","agent":"MARIJA","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/40-2/"},{"id":"res013","nekretnina":"K-District_stan 1.9.2","vlasnik":"","cena":"1610000","agent":"ANĐELA","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/1-9-2-2/"},{"id":"res014","nekretnina":"BW-VIS-2104","vlasnik":"","cena":"575000","agent":"MARIJA","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/2104-2/"},{"id":"res015","nekretnina":"BW-REG-3704","vlasnik":"","cena":"1800000","agent":"ANĐELA","premium":"18.06.","standard":"19.07.","lite":"20.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3704-2/"},{"id":"res016","nekretnina":"Venizelosova 29 B, Novi Dorćol, stan 36","vlasnik":"","cena":"1610000","agent":"ANĐELA","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/36-2/"},{"id":"res017","nekretnina":"Knez Miletina 25_stan 9","vlasnik":"","cena":"780000","agent":"ANA RALEVSKI","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/9-4/"},{"id":"res018","nekretnina":"Vojislava Stojanovića br.20_ Green hill_stan E5-E41 br. 20","vlasnik":"","cena":"989000","agent":"ANĐELA","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/20-2/"},{"id":"res019","nekretnina":"BW-REG-3010","vlasnik":"","cena":"838400","agent":"MARIJA","premium":"18.06.","standard":"19.07.","lite":"20.08.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/3010-2/"},{"id":"res020","nekretnina":"BW-SI2-1204","vlasnik":"","cena":"599000","agent":"ANĐELA","premium":"18.06.","standard":"19.07.","lite":"20.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1204-2/"},{"id":"res021","nekretnina":"Cara Dušana_C.21.PS_Skenderbegova","vlasnik":"","cena":"520000","agent":"MARIJA","premium":"18.06.","standard":"19.07.","lite":"20.08.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/21-4/"},{"id":"res022","nekretnina":"kuća Bela Crkva","vlasnik":"","cena":"1600000","agent":"SLAĐANA","premium":"23.06.","standard":"24.07.","lite":"25.08.","napomena":"TOP OGLAS","url":"https://kadenasothebysrealty.com/sr/property/2-2/"},{"id":"res023","nekretnina":"HADŽI PRODANOVA, STAN 7","vlasnik":"","cena":"1300000","agent":"TIJANA JANKOVIĆ","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/7-2/"},{"id":"res024","nekretnina":"HADŽI PRODANOVA, STAN 5","vlasnik":"","cena":"710000","agent":"TIJANA JANKOVIĆ","premium":"17.06.","standard":"18.07.","lite":"19.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/5-2/"},{"id":"res025","nekretnina":"BW-PER-1408","vlasnik":"","cena":"470000","agent":"MARIJA","premium":null,"standard":"09.07.","lite":"10.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1408-2/"},{"id":"res026","nekretnina":"Airport Garden_Đorđa Stanojevića 37_stan C2 06","vlasnik":"","cena":"247000","agent":"SANJA","premium":null,"standard":"17.07.","lite":"18.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/c2-06-2/"},{"id":"res027","nekretnina":"BW-RIV-507","vlasnik":"","cena":"856000","agent":"MARIJA","premium":"20.07.","standard":"21.08.","lite":"22.09.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/507-2/"},{"id":"res028","nekretnina":"BW-RIV-607","vlasnik":"","cena":"768000","agent":"MARIJA","premium":"20.07.","standard":"21.08.","lite":"22.09.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/607-2/"},{"id":"res029","nekretnina":"ZepTerra 3.28","vlasnik":"","cena":"329000","agent":"ANA RALEVSKI","premium":null,"standard":"21.07.","lite":"22.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3-28-2/"},{"id":"res030","nekretnina":"Kralja Milana 21_stan 8","vlasnik":"","cena":"650000","agent":"ANDJELA","premium":"22.07.","standard":"23.08.","lite":"24.09.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/8-4/"},{"id":"res031","nekretnina":"BW-RIM-2102","vlasnik":"","cena":"360832","agent":"ANĐELA","premium":null,"standard":"22.06.","lite":"23.07.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/2102-2/"},{"id":"res032","nekretnina":"Airport Garden_Đorđa Stanojevića 37_stan 65","vlasnik":"","cena":"247500","agent":"SLAĐANA","premium":null,"standard":"23.07.","lite":"24.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/65-2/"},{"id":"res033","nekretnina":"Andre Nikolića 12B_stan 3","vlasnik":"","cena":"749000","agent":"ANA RALEVSKI","premium":"11.08.","standard":"12.09.","lite":"13.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3-6/"},{"id":"res034","nekretnina":"West 65_stan 4.5","vlasnik":"","cena":"530000","agent":"JOVANA","premium":"18.08.","standard":"19.09.","lite":"20.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/4-5-2/"},{"id":"res035","nekretnina":"Bulevar Maršala Tolbuhina 11_stan 37","vlasnik":"","cena":"379000","agent":"TIJANA JANKOVIĆ","premium":"26.08.","standard":"27.09.","lite":"28.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/37-2/"},{"id":"res036","nekretnina":"Slobodana Jovanovića 19_stan 1","vlasnik":"","cena":"330000","agent":"TIJANA JANKOVIĆ","premium":"27.08.","standard":"28.09.","lite":"29.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1-4/"},{"id":"res037","nekretnina":"BW-SEN-B606","vlasnik":"","cena":"425000","agent":"NINA","premium":null,"standard":"16.09.","lite":"17.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/b606-2/"},{"id":"res038","nekretnina":"Brane Crnčevića 3, stan 4","vlasnik":"","cena":"450000","agent":"ANDJELA","premium":null,"standard":"16.09.","lite":"17.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/4-7/"},{"id":"res039","nekretnina":"Viva B803","vlasnik":"","cena":"344000","agent":"ANĐELA","premium":null,"standard":"29.09.","lite":"30.10.","napomena":"TREBA NA STANDARD","url":"https://kadenasothebysrealty.com/sr/property/b803-2/"},{"id":"res040","nekretnina":"Sakura Park_stan 18","vlasnik":"","cena":"340200","agent":"NINA","premium":null,"standard":"23.09.","lite":"24.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/18-4/"},{"id":"res041","nekretnina":"Sakura Park_stan 49","vlasnik":"","cena":"509310","agent":"NINA","premium":"29.09.","standard":"30.10.","lite":"01.12.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/49-2/"},{"id":"res042","nekretnina":"BW-BON-A003","vlasnik":"","cena":"749000","agent":"MARIJA","premium":"30.09.","standard":"31.10.","lite":"02.12.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/a003-2/"},{"id":"res043","nekretnina":"Voždov Kvart stan 66","vlasnik":"","cena":"171000","agent":"NINA","premium":null,"standard":"02.10.","lite":"03.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/66-2/"},{"id":"res044","nekretnina":"Voždov Kvart stan 78","vlasnik":"","cena":"174800","agent":"NINA","premium":null,"standard":"02.10.","lite":"03.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/78-2/"},{"id":"res045","nekretnina":"BW-IRS-004","vlasnik":"","cena":"208000","agent":"NINA","premium":null,"standard":"05.10.","lite":"06.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/004-2/"},{"id":"res046","nekretnina":"BW-IRS-1406","vlasnik":"","cena":"205000","agent":"NINA","premium":null,"standard":"06.10.","lite":"07.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/unit-1406-2/"},{"id":"res047","nekretnina":"Loznička 7, stan 1","vlasnik":"","cena":"900000","agent":"NINA","premium":"06.10.","standard":"07.11.","lite":"08.12.","napomena":null},{"id":"res048","nekretnina":"BW-KIN-108","vlasnik":"","cena":"395000","agent":"SANJA","premium":null,"standard":"06.10.","lite":"07.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/108-2/"},{"id":"res049","nekretnina":"BW-RES-0906","vlasnik":"","cena":"890000","agent":"MARIJA","premium":"07.10.","standard":"08.11.","lite":"09.12.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/b906-2/"},{"id":"res050","nekretnina":"Venizelosova 33g","vlasnik":"","cena":"465000","agent":"MARIJA","premium":null,"standard":"08.10.","lite":"09.11.","napomena":null},{"id":"res051","nekretnina":"Sakura Park_Jurija Gagarina 19e_stan 63","vlasnik":"","cena":"376650","agent":"NINA","premium":null,"standard":"08.10.","lite":"09.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/63-2/"},{"id":"res052","nekretnina":"Soul 64 B308","vlasnik":"","cena":"275400","agent":"SLAĐANA","premium":null,"standard":"08.10.","lite":"09.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/b308-2/"},{"id":"res053","nekretnina":"Sakura Park_Jurija Gagarina 19e_stan 31","vlasnik":"","cena":"383400","agent":"NINA","premium":null,"standard":null,"lite":null,"napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/31-2/"},{"id":"res054","nekretnina":"Pante Srećkovića 5","vlasnik":"","cena":"659000","agent":"ANA RALEVSKI","premium":"12.10.","standard":"13.11.","lite":"14.12.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/1a-2/"},{"id":"res055","nekretnina":"BW-THA-1401","vlasnik":"","cena":"1850000","agent":"NINA","premium":"12.10.","standard":"13.11.","lite":"14.12.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1401-3/"},{"id":"res056","nekretnina":"Marine Veličković 18","vlasnik":"","cena":"240000","agent":"TIJANA","premium":null,"standard":"13.10.","lite":"14.11.","napomena":"PRVA STRANICA","url":"https://kadenasothebysrealty.com/sr/property/10-4/"},{"id":"res057","nekretnina":"Baranjska 5","vlasnik":"","cena":"175000","agent":"SANJA","premium":null,"standard":"14.10.","lite":"15.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/l2-5-4-2/"},{"id":"res058","nekretnina":"Soul 64 Q601","vlasnik":"","cena":"290000","agent":"ANĐELA","premium":null,"standard":"17.06.","lite":"18.07.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/q601-2/"},{"id":"res059","nekretnina":"Objekat u izgradnji, 1470/18, KO Zuce","vlasnik":"","cena":"869000","agent":"ANA RALEVSKI","premium":"20.10.","standard":"21.11.","lite":"22.12.","napomena":"PRVA STRANICA"},{"id":"res060","nekretnina":"VIVA A607","vlasnik":"","cena":"303600","agent":"ANA RALEVSKI","premium":null,"standard":"21.10.","lite":"22.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/a607-2/"}];
 
+const FOURZIDA_RENTA_DATA = [
+  {"id":"fzr001","nekretnina":"BW-QU1-A-116","vlasnik":"Simka Radulović-Jevrić","cena":"€ 3.000 / mesečno","agent":"Anđela Vučić","premium":null,"top":null,"napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/a116-2/"},
+  {"id":"fzr002","nekretnina":"Južni bulevar stan S23","vlasnik":"Zora Pozman","cena":"€ 2.400 / mesečno","agent":"Anđela Vučić","premium":null,"top":null,"napomena":null},
+  {"id":"fzr003","nekretnina":"Bulevar kralja Aleksandra 142B, stan A.2.3","vlasnik":"Bojana Kujundžić","cena":"€ 1.000 / mesečno","agent":"Milica Radosavljević","premium":null,"top":null,"napomena":null},
+  {"id":"fzr004","nekretnina":"Čika-Ljubina 1, stan 6","vlasnik":"Hans i Dušica Bibus","cena":"€ 1.300 / mesečno","agent":"Marija Kostadinović","premium":null,"top":null,"napomena":null},
+  {"id":"fzr005","nekretnina":"BW-LIB-1401","vlasnik":"Đorđe Đorđević","cena":"€ 4.500 / mesečno","agent":"Anđela Vučić","premium":null,"top":null,"napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1401-2/"},
+  {"id":"fzr006","nekretnina":"Ljutice Bogdana 34","vlasnik":"Miloš Vuković","cena":"€ 11.000 / mesečno","agent":"Ana Ralevski","premium":"06.08.","top":"07.09.","napomena":null},
+  {"id":"fzr007","nekretnina":"Airport Garden, Dolce vita Tošin bunar 224","vlasnik":"SPORTSKI CENTAR VIZURA DOO","cena":"€ 10.000 / mesečno","agent":"Marija Kostadinović","premium":"27.06.","top":"28.07.","napomena":null},
+  {"id":"fzr008","nekretnina":"Malog Radojice 1_stan 1 i 2","vlasnik":"Svetlana Vujović","cena":"€ 6.000 / mesečno","agent":"Slađana Vukmirović","premium":"27.06.","top":"28.07.","napomena":null},
+  {"id":"fzr009","nekretnina":"BW-REG-3704","vlasnik":"Mirko Novakovic","cena":"€ 8.000 / mesečno","agent":"Anđela Vučić","premium":null,"top":null,"napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3704-2/"},
+  {"id":"fzr010","nekretnina":"BW-REG-3805","vlasnik":"Slavica Kecman","cena":"€ 13.000 / mesečno","agent":"Marija Kostadinović","premium":"02.07.","top":"03.08.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3805-2/"},
+  {"id":"fzr011","nekretnina":"Soul 64 Q603","vlasnik":"Mirjana Lončarević","cena":"€ 2.000 / mesečno","agent":"Anđela Vučić","premium":null,"top":null,"napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/q603-2/"},
+  {"id":"fzr012","nekretnina":"Istarska 30","vlasnik":"Oliveru Jakovljević-Rialas","cena":"€ 7.000 / mesečno","agent":"Slađana Vukmirović","premium":"24.08.","top":"25.09.","napomena":null},
+  {"id":"fzr013","nekretnina":"BW St. Regis Residences 2005","vlasnik":"Jelena Jerotijević","cena":"€ 2.500 / mesečno","agent":"Marija Kostadinović","premium":null,"top":"29.09.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/2005-2/"},
+  {"id":"fzr014","nekretnina":"BW-RIV-308","vlasnik":"Jelena Jerotijević","cena":"€ 2.000 / mesečno","agent":"Marija Kostadinović","premium":null,"top":"29.09.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/308-2/"},
+  {"id":"fzr015","nekretnina":"Sakura Park_LOKAL","vlasnik":"Goldberg Real Estate doo Beograd","cena":"€ 4.500 / mesečno","agent":"Nina Pena","premium":"20.10.","top":"21.11.","napomena":null},
+  {"id":"fzr016","nekretnina":"Vajara Đoke Jovanovica 14_stan 2","vlasnik":"Ljubiša Vučinić","cena":"€ 3.500 / mesečno","agent":"Slađana Vukmirović","premium":null,"top":"30.09.","napomena":null},
+  {"id":"fzr017","nekretnina":"Drinićka 2A","vlasnik":"Aleksandar Milovanović","cena":"€ 2.500 / mesečno","agent":"Ana Ralevski","premium":null,"top":"30.09.","napomena":null},
+  {"id":"fzr018","nekretnina":"Mome Kapora 12_Merin plaza_stan 17","vlasnik":"Jelena Petrović","cena":"€ 5.000 / mesečno","agent":"Marija Kostadinović","premium":"30.09.","top":"31.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/17-2/"},
+  {"id":"fzr019","nekretnina":"Vila Lavanda","vlasnik":"Anja Freifrau Knyphausen","cena":"€ 5.700 / mesečno","agent":"Anđela Vučić","premium":null,"top":"15.10.","napomena":null},
+  {"id":"fzr020","nekretnina":"Strahinjića Bana 17-19, stan br18","vlasnik":"Željka Demane Debih","cena":"€ 3.000 / mesečno","agent":"Marija Kostadinović","premium":null,"top":"16.10.","napomena":null},
+  {"id":"fzr021","nekretnina":"Vlajkovićeva 16, stan 2","vlasnik":"Zotovic","cena":"€ 1.500 / mesečno","agent":"Marija Kostadinović","premium":null,"top":"06.10.","napomena":null},
+  {"id":"fzr022","nekretnina":"Resavska 59_stan 3","vlasnik":"Vićentije Petrović","cena":"€ 4.000 / mesečno","agent":"Ana Ralevski","premium":null,"top":"07.10.","napomena":null},
+  {"id":"fzr023","nekretnina":"Obalskih radnika 3","vlasnik":"Renata Pindžo","cena":"€ 1.900 / mesečno","agent":"Ana Ralevski","premium":null,"top":"12.10.","napomena":null},
+  {"id":"fzr024","nekretnina":"Soul 64_E303","vlasnik":"Predrag Sredojević","cena":"€ 1.300 / mesečno","agent":"Jovana Angelovski","premium":null,"top":"12.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/e303-2/"}
+];
+
+const FOURZIDA_RESALE_DATA = [
+  {"id":"fzs001","nekretnina":"West 65_40.01","vlasnik":"","cena":"5.000.000","agent":"Anđela Vučić","premium":"03.11.","top":"02.11.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/40-1-2/"},
+  {"id":"fzs002","nekretnina":"Čelopečka 4, Zvezdara, Zahumska","vlasnik":"","cena":"470.000","agent":"Jovana Angelovski","premium":null,"top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1-2/"},
+  {"id":"fzs003","nekretnina":"BW-PER-906","vlasnik":"","cena":"950.000","agent":"Anđela Vučić","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/906-2/"},
+  {"id":"fzs004","nekretnina":"BW-TER-903","vlasnik":"","cena":"1.220.000","agent":"Tijana Janković","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/903-2/"},
+  {"id":"fzs005","nekretnina":"BW-REG-3102","vlasnik":"","cena":"599.000","agent":"Nina Pena","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3102-2/"},
+  {"id":"fzs006","nekretnina":"BW-MET-A209","vlasnik":"","cena":"170.000","agent":"Marija Kostadinović","premium":null,"top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/a209-2/"},
+  {"id":"fzs007","nekretnina":"Generala Nikodija Stefanovića 3","vlasnik":"","cena":"5.200.000","agent":"Marija Kostadinović","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3-4/"},
+  {"id":"fzs008","nekretnina":"Senjačka 048","vlasnik":"","cena":"5.500.000","agent":"Marija Kostadinović","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/48-4/"},
+  {"id":"fzs009","nekretnina":"Nikole Pašića 193, Mladenovac, vila Vista","vlasnik":"","cena":"395.000","agent":"Anđela Vučić","premium":null,"top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/193-2/"},
+  {"id":"fzs010","nekretnina":"Tadije Sondermajera 1, stan 40, wellport","vlasnik":"","cena":"525.000","agent":"Marija Kostadinović","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/40-2/"},
+  {"id":"fzs011","nekretnina":"K-District_stan 1.9.2","vlasnik":"","cena":"1.610.000","agent":"Anđela Vučić","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1-9-2-2/"},
+  {"id":"fzs012","nekretnina":"BW-VIS-2104","vlasnik":"","cena":"575.000","agent":"Marija Kostadinović","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/2104-2/"},
+  {"id":"fzs013","nekretnina":"BW-REG-3704","vlasnik":"","cena":"1.800.000","agent":"Anđela Vučić","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3704-2/"},
+  {"id":"fzs014","nekretnina":"Venizelosova 29 B, Novi Dorćol, stan 36","vlasnik":"","cena":"1.610.000","agent":"Anđela Vučić","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/36-2/"},
+  {"id":"fzs015","nekretnina":"Knez Miletina 25_stan 9","vlasnik":"","cena":"780.000","agent":"Ana Ralevski","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/9-4/"},
+  {"id":"fzs016","nekretnina":"BW-REG-3010","vlasnik":"","cena":"838.400","agent":"Marija Kostadinović","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/3010-2/"},
+  {"id":"fzs017","nekretnina":"BW-SI2-1204","vlasnik":"","cena":"599.000","agent":"Anđela Vučić","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/1204-2/"},
+  {"id":"fzs018","nekretnina":"kuća Bela Crkva","vlasnik":"","cena":"1.600.000","agent":"Slađana Vukmirović","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/2-2/"},
+  {"id":"fzs019","nekretnina":"HADŽI PRODANOVA, STAN 7","vlasnik":"","cena":"1.300.000","agent":"Tijana Janković","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/7-2/"},
+  {"id":"fzs020","nekretnina":"HADŽI PRODANOVA, STAN 5","vlasnik":"","cena":"710.000","agent":"Tijana Janković","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/5-2/"},
+  {"id":"fzs021","nekretnina":"BW-RIV-507","vlasnik":"","cena":"856.000","agent":"Marija Kostadinović","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/507-2/"},
+  {"id":"fzs022","nekretnina":"BW-RIV-607","vlasnik":"","cena":"768.000","agent":"Marija Kostadinović","premium":"03.11.","top":"02.10.","napomena":null,"url":"https://kadenasothebysrealty.com/sr/property/607-2/"}
+];
+
 async function init() {
   loadLocalStorage();
   renderRulesForm();
@@ -965,6 +1197,8 @@ async function init() {
   rentaBase = RENTA_HALO_DATA;
   nkrRentaBase = NKR_RENTA_DATA;
   nkrResaleBase = NKR_RESALE_DATA;
+  fourZidaRentaBase = FOURZIDA_RENTA_DATA;
+  fourZidaResaleBase = FOURZIDA_RESALE_DATA;
   const lu = document.getElementById('lastUpdated');
   if (lu) {
     try {
@@ -975,6 +1209,7 @@ async function init() {
 
   mergeHaloData();
   mergeNkrData();
+  mergeFourZidaData();
   renderHaloTable();
   updateBadges();
 }
@@ -1165,7 +1400,7 @@ function nkrNextTransition(r) {
 // ============================================================
 function switchMainTab(tab) {
   currentMainTab = tab;
-  const allTabs = ['halo','nkr','stats','pravila'];
+  const allTabs = ['halo','nkr','fourzida','stats','pravila'];
   allTabs.forEach(t => {
     document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
   });
@@ -1173,6 +1408,7 @@ function switchMainTab(tab) {
     el.classList.toggle('active', allTabs[i]===tab);
   });
   if (tab === 'nkr') renderNkrTable();
+  if (tab === 'fourzida') renderFourZidaTable();
   if (tab === 'stats') renderStats();
 }
 
@@ -1222,6 +1458,8 @@ function updateBadges() {
   document.getElementById('badgeRenta').textContent = rentaData.filter(r=>r.haloStatus==='active'||r.haloStatus==='never_remove').length;
   document.getElementById('badgeNkrRenta').textContent = nkrRentaData.length;
   document.getElementById('badgeNkrResale').textContent = nkrResaleData.length;
+  document.getElementById('badge4zRenta').textContent = fourZidaRentaData.length;
+  document.getElementById('badge4zResale').textContent = fourZidaResaleData.length;
 }
 
 // ============================================================
@@ -1541,9 +1779,21 @@ function renderStats() {
     return currentPhase(computeHaloScheduleFromRecord(r, type))?.phase === 'Expired';
   }).length;
 
+  function countFzPhasesForStats(data) {
+    const counts = {};
+    data.forEach(r => {
+      const ph = fourZidaCurrentPhase(r);
+      const label = ph.phase === 'premium' ? 'Premium' : ph.phase === 'top' ? 'Top' : 'Isteklo';
+      counts[label] = (counts[label]||0) + 1;
+    });
+    return counts;
+  }
+
+  const fzTotal = fourZidaRentaData.length + fourZidaResaleData.length;
+
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card">
-      <div class="stat-num">${prodajaData.length + rentaData.length + nkrRentaData.length + nkrResaleData.length}</div>
+      <div class="stat-num">${prodajaData.length + rentaData.length + nkrRentaData.length + nkrResaleData.length + fzTotal}</div>
       <div class="stat-label">Ukupno oglasa</div>
     </div>
     <div class="stat-card">
@@ -1557,6 +1807,11 @@ function renderStats() {
       <div class="stat-sub">${nkrRentaData.length} renta + ${nkrResaleData.length} resale</div>
     </div>
     <div class="stat-card">
+      <div class="stat-num" style="color:#1565c0">${fzTotal}</div>
+      <div class="stat-label">4Zida</div>
+      <div class="stat-sub">${fourZidaRentaData.length} renta + ${fourZidaResaleData.length} resale</div>
+    </div>
+    <div class="stat-card">
       <div class="stat-num" style="color:var(--red)">${totalExp(prodajaData,'prodaja')+totalExp(rentaData,'renta')}</div>
       <div class="stat-label">Isteklo (Halo)</div>
       <div class="stat-sub">Potrebna obnova</div>
@@ -1567,6 +1822,8 @@ function renderStats() {
   renderBarChart('chartRenta', countHaloPhases(rentaData, 'renta'), rentaData.length || 1);
   renderBarChart('chartNkrRenta', countNkrPhases(nkrRentaData), nkrRentaData.length || 1);
   renderBarChart('chartNkrResale', countNkrPhases(nkrResaleData), nkrResaleData.length || 1);
+  renderBarChart('chartFzRenta', countFzPhasesForStats(fourZidaRentaData), fourZidaRentaData.length || 1);
+  renderBarChart('chartFzResale', countFzPhasesForStats(fourZidaResaleData), fourZidaResaleData.length || 1);
 }
 
 function renderBarChart(containerId, counts, total) {
@@ -1600,7 +1857,7 @@ function renderBarChart(containerId, counts, total) {
 // RULES
 // ============================================================
 function renderRulesForm() {
-  const ids = ['premDays','premRep','stdDaysProd','topDays','topRep','stdDaysRenta','nkrPremDays','nkrStdDays','nkrLiteDays'];
+  const ids = ['premDays','premRep','stdDaysProd','topDays','topRep','stdDaysRenta','nkrPremDays','nkrStdDays','nkrLiteDays','fzPremDays','fzTopDays'];
   ids.forEach(id => {
     const el = document.getElementById('r_'+id);
     if (el && rules[id] !== undefined) el.value = rules[id];
@@ -1618,6 +1875,8 @@ function saveRules() {
     nkrPremDays: +document.getElementById('r_nkrPremDays').value || 30,
     nkrStdDays: +document.getElementById('r_nkrStdDays').value || 30,
     nkrLiteDays: +document.getElementById('r_nkrLiteDays').value || 30,
+    fzPremDays: +document.getElementById('r_fzPremDays').value || 30,
+    fzTopDays: +document.getElementById('r_fzTopDays').value || 30,
   };
   Object.assign(rules, newRules);
   try { localStorage.setItem(LS_RULES, JSON.stringify(newRules)); } catch(e) {}
@@ -1626,6 +1885,301 @@ function saveRules() {
   setTimeout(()=>note.style.display='none', 2500);
   renderHaloTable();
   renderNkrTable();
+  renderFourZidaTable();
+}
+
+// ============================================================
+// 4ZIDA LOGIKA
+// ============================================================
+function fourZidaCurrentPhase(r) {
+  const premDate = parseDate(r.premium);
+  const topDate = parseDate(r.top);
+  const todayD = today();
+  const premDays = rules.fzPremDays || 30;
+  const topDays = rules.fzTopDays || 30;
+
+  // Ako nemamo datume — nikad oglašavan
+  if (!premDate && !topDate) return {phase:'none', label:'—', cls:'phase-expired'};
+
+  // Handle anomalija: top pre premium (prelaz meseca u Excelu)
+  // Uzimamo raniji datum kao početak, kasniji kao početak sledeće faze
+  let effectivePrem = premDate;
+  let effectiveTop = topDate;
+  if (premDate && topDate && topDate < premDate) {
+    // top je zapravo stariji — znači premium je noviji (čudan unos)
+    // Tretiramo top kao prvu fazu, premium kao drugu
+    effectivePrem = topDate;
+    effectiveTop = premDate;
+  }
+
+  if (effectivePrem) {
+    const premEnd = addDays(effectivePrem, premDays);
+    if (todayD < premEnd) {
+      const daysLeft = diffDays(todayD, premEnd);
+      return {phase:'premium', label:'Premium', cls:'phase-premium', daysLeft, endDate: premEnd};
+    }
+    // Premium istekao
+    if (effectiveTop) {
+      const topEnd = addDays(effectiveTop, topDays);
+      if (todayD < topEnd) {
+        const daysLeft = diffDays(todayD, topEnd);
+        return {phase:'top', label:'Top', cls:'phase-std', daysLeft, endDate: topEnd};
+      }
+      return {phase:'expired', label:'Isteklo', cls:'phase-expired'};
+    }
+    // Nema top datuma — Premium istekao
+    return {phase:'expired', label:'Isteklo', cls:'phase-expired'};
+  }
+
+  // Samo top datum
+  if (effectiveTop) {
+    const topEnd = addDays(effectiveTop, topDays);
+    if (todayD < topEnd) {
+      const daysLeft = diffDays(todayD, topEnd);
+      return {phase:'top', label:'Top', cls:'phase-std', daysLeft, endDate: topEnd};
+    }
+    return {phase:'expired', label:'Isteklo', cls:'phase-expired'};
+  }
+
+  return {phase:'none', label:'—', cls:'phase-expired'};
+}
+
+function fourZidaNextTransition(r) {
+  const ph = fourZidaCurrentPhase(r);
+  if (!ph.endDate) return null;
+  return ph.endDate;
+}
+
+function fourZidaUrgency(r) {
+  const ph = fourZidaCurrentPhase(r);
+  if (ph.phase === 'expired' || ph.phase === 'none') return 'expired';
+  if (ph.daysLeft !== undefined) {
+    if (ph.daysLeft <= 3) return 'hitno';
+    if (ph.daysLeft <= 7) return 'uskoro';
+  }
+  return 'ok';
+}
+
+function fourZidaPhasePriority(r) {
+  const ph = fourZidaCurrentPhase(r);
+  if (ph.phase === 'premium') return 0;
+  if (ph.phase === 'top') return 1;
+  return 2;
+}
+
+function countFourZidaPhases(data) {
+  const counts = {premium:0, top:0, expired:0};
+  data.forEach(r => {
+    const ph = fourZidaCurrentPhase(r);
+    if (ph.phase === 'premium') counts.premium++;
+    else if (ph.phase === 'top') counts.top++;
+    else counts.expired++;
+  });
+  return counts;
+}
+
+function switchFourZidaType(type) {
+  currentFourZidaType = type;
+  document.getElementById('fzSubResale').classList.toggle('active', type==='resale');
+  document.getElementById('fzSubRenta').classList.toggle('active', type==='renta');
+  renderFourZidaTable();
+}
+
+function setFourZidaFilter(f) {
+  fourZidaFilter = f;
+  document.getElementById('fzFilterAll').classList.toggle('active', f==='sve');
+  document.getElementById('fzFilterUrgent').classList.toggle('active', f==='hitno');
+  document.getElementById('fzFilterSoon').classList.toggle('active', f==='uskoro');
+  renderFourZidaTable();
+}
+
+function renderFourZidaTable() {
+  const data = currentFourZidaType === 'renta' ? fourZidaRentaData : fourZidaResaleData;
+  const q = (document.getElementById('fzSearch')?.value || '').toLowerCase();
+  let rows = data.filter(r => {
+    if (q && !JSON.stringify(r).toLowerCase().includes(q)) return false;
+    if (fourZidaFilter === 'hitno') return fourZidaUrgency(r) === 'hitno';
+    if (fourZidaFilter === 'uskoro') return fourZidaUrgency(r) === 'uskoro';
+    return true;
+  });
+  rows.sort((a,b) => fourZidaPhasePriority(a) - fourZidaPhasePriority(b));
+
+  const head = document.getElementById('fzTableHead');
+  const body = document.getElementById('fzTableBody');
+  head.innerHTML = '<th>#</th><th>Nekretnina</th><th>Agent</th><th>Cena</th><th>Faza</th><th>Premium od</th><th>Top od</th><th>Isteklo za</th><th>Napomena</th>';
+  body.innerHTML = rows.length ? rows.map((r,i) => renderFourZidaRow(r,i+1)).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:32px">Nema oglasa</td></tr>';
+}
+
+function renderFourZidaRow(r, idx) {
+  const ph = fourZidaCurrentPhase(r);
+  const urg = fourZidaUrgency(r);
+  let urgIcon = '';
+  if (urg === 'hitno') urgIcon = '<span title="Hitno!">🔴</span> ';
+  else if (urg === 'uskoro') urgIcon = '<span title="Uskoro ističe">🟡</span> ';
+
+  const daysCell = ph.daysLeft !== undefined
+    ? `<span class="${urg==='hitno'?'text-red':urg==='uskoro'?'text-yellow':''}">${ph.daysLeft}d</span>`
+    : '—';
+
+  const urlHtml = r.url
+    ? `<a href="${r.url}" target="_blank" class="prop-link">${r.nekretnina||'—'}</a>`
+    : (r.nekretnina||'—');
+
+  return `<tr onclick="openFourZidaEdit('${r.id}')" style="cursor:pointer">
+    <td>${idx}</td>
+    <td>${urgIcon}${urlHtml}</td>
+    <td>${r.agent||'—'}</td>
+    <td>${r.cena||'—'}</td>
+    <td><span class="phase-badge ${ph.cls}">${ph.label}</span></td>
+    <td>${r.premium||'—'}</td>
+    <td>${r.top||'—'}</td>
+    <td>${daysCell}</td>
+    <td>${r.napomena||''}</td>
+  </tr>`;
+}
+
+function openFourZidaAdd() {
+  fourZidaEditingId = null;
+  fourZidaSelectedPackage = null;
+  document.getElementById('fzModalTitle').textContent = 'Dodaj oglas – 4Zida';
+  document.getElementById('fzIsAdd').value = '1';
+  document.getElementById('fzAddSection').style.display = 'block';
+  document.getElementById('fzEditSection').style.display = 'none';
+  document.getElementById('fzDeleteBtn').style.display = 'none';
+  const t = new Date();
+  document.getElementById('fzFStartDate').value = String(t.getDate()).padStart(2,'0') + '.' + String(t.getMonth()+1).padStart(2,'0') + '.';
+  document.getElementById('fzFNekretninaAdd').value = '';
+  document.getElementById('fzFAgentAdd').value = '';
+  document.getElementById('fzFCenaAdd').value = '';
+  document.getElementById('fzFNapomenaAdd').value = '';
+  // Resetuj pkg selection
+  document.querySelectorAll('#fzPackagePicker .pkg-btn').forEach(b => b.classList.remove('selected'));
+  fzUpdatePreview();
+  document.getElementById('fzOverlay').classList.add('open');
+}
+
+function openFourZidaEdit(id) {
+  const data = currentFourZidaType === 'renta' ? fourZidaRentaData : fourZidaResaleData;
+  const r = data.find(x => x.id === id);
+  if (!r) return;
+  fourZidaEditingId = id;
+  document.getElementById('fzModalTitle').textContent = 'Izmeni oglas – 4Zida';
+  document.getElementById('fzIsAdd').value = '0';
+  document.getElementById('fzAddSection').style.display = 'none';
+  document.getElementById('fzEditSection').style.display = 'block';
+  document.getElementById('fzDeleteBtn').style.display = 'inline-block';
+  document.getElementById('fzFNekretnina').value = r.nekretnina||'';
+  document.getElementById('fzFAgent').value = r.agent||'';
+  document.getElementById('fzFCena').value = r.cena||'';
+  document.getElementById('fzFPremium').value = r.premium||'';
+  document.getElementById('fzFTop').value = r.top||'';
+  document.getElementById('fzFNapomena').value = r.napomena||'';
+  document.getElementById('fzOverlay').classList.add('open');
+}
+
+function closeFourZidaModal() {
+  document.getElementById('fzOverlay').classList.remove('open');
+  fourZidaEditingId = null;
+}
+
+function selectFzPkg(pkg) {
+  fourZidaSelectedPackage = pkg;
+  document.querySelectorAll('#fzPackagePicker .pkg-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.pkg === pkg);
+  });
+  fzUpdatePreview();
+}
+
+function fzUpdatePreview() {
+  const dateStr = document.getElementById('fzFStartDate')?.value || '';
+  const pkg = fourZidaSelectedPackage;
+  const prev = document.getElementById('fzAddPreview');
+  if (!prev) return;
+  prev.style.display = 'block';
+  if (!pkg || !dateStr) { prev.textContent = 'Odaberi paket i datum.'; return; }
+  const startDate = parseDate(dateStr);
+  if (!startDate) { prev.textContent = 'Neispravan datum.'; return; }
+  const premDays = rules.fzPremDays || 30;
+  const topDays = rules.fzTopDays || 30;
+  if (pkg === 'premium') {
+    const premEnd = addDays(startDate, premDays);
+    const topEnd = addDays(premEnd, topDays);
+    prev.textContent = `Premium: ${fmtDate(startDate)} → ${fmtDate(premEnd)} | Top: ${fmtDate(premEnd)} → ${fmtDate(topEnd)}`;
+  } else {
+    const topEnd = addDays(startDate, topDays);
+    prev.textContent = `Top: ${fmtDate(startDate)} → ${fmtDate(topEnd)}`;
+  }
+}
+
+function saveFourZidaAd() {
+  const isAdd = document.getElementById('fzIsAdd').value === '1';
+  const lsKey = currentFourZidaType === 'renta' ? '4zida_renta' : '4zida_resale';
+
+  if (isAdd) {
+    const dateStr = document.getElementById('fzFStartDate').value.trim();
+    const pkg = fourZidaSelectedPackage;
+    const nekretnina = document.getElementById('fzFNekretninaAdd').value.trim();
+    const agent = document.getElementById('fzFAgentAdd').value.trim();
+    const cena = document.getElementById('fzFCenaAdd').value.trim();
+    const napomena = document.getElementById('fzFNapomenaAdd').value.trim();
+    if (!pkg) { alert('Odaberi paket (Premium ili Top).'); return; }
+    if (!nekretnina) { alert('Unesi naziv nekretnine.'); return; }
+    const startDate = parseDate(dateStr);
+    let premium = null, top = null;
+    if (pkg === 'premium') {
+      premium = dateStr;
+      // top počinje kad premium istekne
+      const premEnd = addDays(startDate, rules.fzPremDays || 30);
+      top = String(premEnd.getDate()).padStart(2,'0') + '.' + String(premEnd.getMonth()+1).padStart(2,'0') + '.';
+    } else {
+      top = dateStr;
+    }
+    const newRecord = {
+      id: 'fz_' + Date.now(),
+      nekretnina, agent, cena, premium, top, napomena, url: ''
+    };
+    const edits = localEdits[lsKey] || [];
+    edits.push(newRecord);
+    localEdits[lsKey] = edits;
+    try { localStorage.setItem(LS_KEY, JSON.stringify(localEdits)); } catch(e) {}
+  } else {
+    // EDIT mode
+    const id = fourZidaEditingId;
+    const nekretnina = document.getElementById('fzFNekretnina').value.trim();
+    const agent = document.getElementById('fzFAgent').value.trim();
+    const cena = document.getElementById('fzFCena').value.trim();
+    const premium = document.getElementById('fzFPremium').value.trim() || null;
+    const top = document.getElementById('fzFTop').value.trim() || null;
+    const napomena = document.getElementById('fzFNapomena').value.trim();
+    const allData = currentFourZidaType === 'renta' ? fourZidaRentaData : fourZidaResaleData;
+    const orig = allData.find(x => x.id === id) || {};
+    const updated = {...orig, nekretnina, agent, cena, premium, top, napomena};
+    const edits = (localEdits[lsKey] || []).filter(x => x.id !== id);
+    edits.push(updated);
+    localEdits[lsKey] = edits;
+    try { localStorage.setItem(LS_KEY, JSON.stringify(localEdits)); } catch(e) {}
+  }
+
+  mergeFourZidaData();
+  updateBadges();
+  renderFourZidaTable();
+  closeFourZidaModal();
+}
+
+function deleteFourZidaAd() {
+  if (!fourZidaEditingId) return;
+  const lsKey = currentFourZidaType === 'renta' ? '4zida_renta' : '4zida_resale';
+  const delKey = currentFourZidaType === 'renta' ? '4zida_renta_deleted' : '4zida_resale_deleted';
+  const deleted = localEdits[delKey] || [];
+  if (!deleted.includes(fourZidaEditingId)) deleted.push(fourZidaEditingId);
+  localEdits[delKey] = deleted;
+  // Ukloni i iz edits
+  localEdits[lsKey] = (localEdits[lsKey] || []).filter(x => x.id !== fourZidaEditingId);
+  try { localStorage.setItem(LS_KEY, JSON.stringify(localEdits)); } catch(e) {}
+  mergeFourZidaData();
+  updateBadges();
+  renderFourZidaTable();
+  closeFourZidaModal();
 }
 
 // ============================================================
