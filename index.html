@@ -1255,6 +1255,7 @@ function parseDate(str) {
     let year = now.getFullYear();
     const d = new Date(year, +m[2]-1, +m[1]);
     if (d > addDays(now, 180)) d.setFullYear(year - 1);
+    else if (d < addDays(now, -30)) d.setFullYear(year + 1);
     return d;
   }
   const iso = new Date(str);
